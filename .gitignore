@@ -1,3 +1,4 @@
 .idea
 recipe_management/recipe_management/__pycache__/*
 recipe_management/recipes/migrations/*
+recipe_management/recipes/__pycache__/*
