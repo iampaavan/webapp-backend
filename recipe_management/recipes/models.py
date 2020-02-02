@@ -13,9 +13,6 @@ class User(models.Model):
     account_created = models.DateTimeField(auto_now_add=True)
     account_updated = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        db_table = 'User'
-
 
 class Recipes(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -32,16 +29,10 @@ class Recipes(models.Model):
     steps = ''
     nutrition_information = ''
 
-    class Meta:
-        db_table = 'Recipes'
-
 
 class OrderedList(models.Model):
     position = models.IntegerField()
     items = models.CharField(max_length=256)
-
-    class Meta:
-        db_table = 'OrderedList'
 
 
 class NutritionalInformation(models.Model):
@@ -50,6 +41,3 @@ class NutritionalInformation(models.Model):
     sodium_in_mg = models.IntegerField()
     carbohydrates_in_grams = models.DecimalField(max_digits=5, decimal_places=2)
     protein_in_grams = models.DecimalField(max_digits=5, decimal_places=2)
-
-    class Meta:
-        db_table = 'NutritionalInformation'
