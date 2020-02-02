@@ -2,12 +2,12 @@ import json
 import bcrypt
 import base64
 from django.db import IntegrityError
+from .serializers import UserSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
 from django.http import JsonResponse
-from django.core import serializers
 from .models import User
 
 email = ""
@@ -22,7 +22,7 @@ def user(request):
             if item not in keys:
                 missing_keys.append(item)
         if missing_keys:
-            return HttpResponse("Missing {}".format(", ".join(missing_keys)), status=400)
+            return HttpResponse("Missing {}".format(", ".join(missing_keys)), status=400, content_type="application/json")
 
         first_name = request_body['first_name']
         last_name = request_body['last_name']
@@ -31,23 +31,23 @@ def user(request):
         try:
             validate_email(email)
         except ValidationError:
-            return HttpResponse("Invalid Email", status=400)
+            return HttpResponse("Invalid Email", status=400, content_type="application/json")
         try:
-            validate = RegexValidator(regex='[A-Za-z0-9@#$%^&+=]{8,}')
+            validate = RegexValidator(regex='^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')
             validate(pwd)
         except ValidationError:
-            return HttpResponse("Enter a Strong Password", status=400)
+            return HttpResponse("Enter a Strong Password", status=400, content_type="application/json")
 
         encrypt_pwd = encryptpwd(pwd)
         new_user = User(first_name=first_name, last_name=last_name, password=encrypt_pwd, email_address=email)
+        ser = UserSerializer(new_user)
         try:
             new_user.save()
-            ser = serializers.serialize("json", [new_user,], fields=('id','first_name','last_name','email_address', 'account_created', 'account_updated'))
         except IntegrityError as e:
-            return HttpResponse("User already exists", status=400)
-        return HttpResponse(ser,status=201, content_type="application/json")
+            return HttpResponse("User already exists", status=400, content_type="application/json")
+        return JsonResponse(ser.data, status=201)
     else:
-        return JsonResponse("Invalid Request method", status=400, safe=False)
+        return HttpResponse("Invalid Request method", status=400, content_type="application/json")
 
 def update_user(request):
     if request.method == 'PUT':
