@@ -12,6 +12,7 @@ from .models import User
 
 email = ""
 
+
 def user(request):
     if request.method == 'POST':
         request_body = json.loads(request.body)
@@ -50,6 +51,7 @@ def user(request):
         return JsonResponse(ser.data, status=201)
     else:
         return HttpResponse("Invalid Request method", status=400, content_type="application/json")
+
 
 def update_user(request):
     if request.method == 'PUT':
@@ -100,14 +102,17 @@ def update_user(request):
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
 
+
 def encryptpwd(pwd):
     salt = bcrypt.gensalt()
     encoded_pwd = pwd.encode('utf-8')
     hash_pwd = bcrypt.hashpw(encoded_pwd, salt).decode('utf-8')
     return hash_pwd
 
+
 def decryptpwd(pwd, hashed_pwd):
     return bcrypt.checkpw(pwd, hashed_pwd.encode('utf-8'))
+
 
 def checkauth(auth):
     global email
