@@ -107,10 +107,8 @@ def update_user(request):
     elif request.method == 'GET':
         auth = request.headers.get('Authorization')
         auth_status = checkauth(auth)
-        user_obj = User.objects.get(email_address=email)
-        serialize = UserSerializer(user_obj)
-        if auth_status == 'success':
-            return JsonResponse(serialize.data, status=200)
+        response = get_auth_status(auth_status)
+        return response
 
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
@@ -145,5 +143,15 @@ def checkauth(auth):
         return "no_user"
 
 
+def get_auth_status(auth_status):
 
+    if auth_status == 'success':
+        user_obj = User.objects.get(email_address=email)
+        serialize = UserSerializer(user_obj)
+        return JsonResponse(serialize.data, status=200)
 
+    elif auth_status == 'wrong_pwd':
+        return JsonResponse("Wrong Password", status=403, safe=False)
+
+    elif auth_status == 'no_user':
+        return JsonResponse("User Not Found", status=404, safe=False)
