@@ -208,3 +208,10 @@ def check_params(req_params, req_body):
         if item not in keys:
             missing_keys.append(item)
     return missing_keys
+
+
+def get_newest_recipe(request):
+    if request.method == 'GET':
+        recipe_obj = Recipes.objects.all().order_by('-updated_ts').first()
+        serialize = RecipeSerializer(recipe_obj)
+        return JsonResponse(serialize.data, status=200)
