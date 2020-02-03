@@ -166,6 +166,7 @@ def create_recipe(request):
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
 
+
 def get_newest_recipe(request):
     if request.method == 'GET':
         try:
@@ -175,18 +176,23 @@ def get_newest_recipe(request):
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
 
+    elif request.method == 'POST' or request.method == 'DELETE' or request.method == 'PUT':
+        return JsonResponse("Bad Request", status=400, safe=False)
 
-def get_new_recipe_byID(request, id):
+
+def get_new_recipe_by_id(request, id):
     if request.method == "GET":
         try:
             recipe_obj = Recipes.objects.get(pk=id)
-            print(recipe_obj)
             serlializer = RecipeSerializer(recipe_obj)
             return JsonResponse(serlializer.data, status=200)
         except ValidationError:
             return JsonResponse("Recipe not Found", status=404, safe=False)
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
+
+    elif request.method == 'POST' or request.method == 'DELETE' or request.method == 'PUT':
+        return JsonResponse("Bad Request", status=400, safe=False)
 
 
 def encryptpwd(pwd):
@@ -235,9 +241,9 @@ def check_params(req_params, req_body):
     keys = req_body.keys()
     missing_keys = []
     for item in req_params:
-        if (item not in keys):
+        if item not in keys:
             missing_keys.append(item)
             continue
-        elif (not req_body[item]):
+        elif not req_body[item]:
             missing_keys.append(item)
     return missing_keys
