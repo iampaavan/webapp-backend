@@ -2,11 +2,7 @@ import json
 import bcrypt
 import base64
 from django.db import IntegrityError
-<<<<<<< HEAD
-from .serializers import UserSerializer, GetUserSerializer
-=======
-from .serializers import UserSerializer, RecipeSerializer, OrderlistSerializer
->>>>>>> 65758c0e8f3a408c291d4e0934825e6914093d67
+from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
@@ -29,7 +25,8 @@ def user(request):
             if item not in keys:
                 missing_keys.append(item)
         if missing_keys:
-            return HttpResponse("Missing {}".format(", ".join(missing_keys)), status=400, content_type="application/json")
+            return HttpResponse("Missing {}".format(", ".join(missing_keys)), status=400,
+                                content_type="application/json")
 
         first_name = request_body['first_name']
         last_name = request_body['last_name']
@@ -55,10 +52,6 @@ def user(request):
         return JsonResponse(ser.data, status=201)
     else:
         return HttpResponse("Invalid Request method", status=400, content_type="application/json")
-
-
-def get_user(request):
-    pass
 
 
 def update_user(request):
@@ -112,6 +105,7 @@ def update_user(request):
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
 
+
 def create_recipe(request):
     if request.method == "POST":
         auth = request.headers.get('Authorization')
@@ -143,8 +137,6 @@ def create_recipe(request):
                                                    protein_in_grams=nutri_info['protein_in_grams'])
             nutrition_obj.save()
 
-
-
             recipe_obj = Recipes(author_id=author, cook_time_in_min=cook_time_in_min, prep_time_in_min=prep_time_in_min,
                                  total_time_in_min=total_time, title=title, cuisine=cuisine, servings=servings,
                                  ingredients=ingredients, nutrition_information=nutrition_obj)
@@ -153,14 +145,6 @@ def create_recipe(request):
             for item in steps:
                 order_obj = OrderedList(position=item['position'], items=item['items'], recipe=recipe_obj)
                 order_obj.save()
-
-
-
-            # query_set = OrderedList.objects.filter(recipe=recipe_obj.id).values()
-            # serial = OrderlistSerializer(query_set, many=True)
-            #
-            # recipe_obj.steps = serial
-            # recipe_obj.save()
 
             ser = RecipeSerializer(recipe_obj)
 
@@ -193,9 +177,9 @@ def checkauth(auth):
     creds = decoded_value.split(":")
     email = creds[0]
     pwd = creds[1]
-    if (User.objects.filter(email_address=email).exists()):
+    if User.objects.filter(email_address=email).exists():
         user_obj = User.objects.get(email_address=email)
-        if (decryptpwd(pwd.encode('utf-8'),user_obj.password)):
+        if decryptpwd(pwd.encode('utf-8'), user_obj.password):
             return "success"
         else:
             return "wrong_pwd"
@@ -216,6 +200,7 @@ def get_auth_status(auth_status):
     elif auth_status == 'no_user':
         return JsonResponse("User Not Found", status=404, safe=False)
 
+
 def check_params(req_params, req_body):
     keys = req_body.keys()
     missing_keys = []
@@ -223,4 +208,3 @@ def check_params(req_params, req_body):
         if item not in keys:
             missing_keys.append(item)
     return missing_keys
-

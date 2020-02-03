@@ -36,6 +36,7 @@ class Recipes(models.Model):
     ingredients = ArrayField(models.CharField(max_length=200), blank=True)
     nutrition_information = models.OneToOneField(NutritionalInformation, on_delete=models.CASCADE, null=True)
 
+
 class OrderedList(models.Model):
     position = models.IntegerField()
     items = models.CharField(max_length=256)
