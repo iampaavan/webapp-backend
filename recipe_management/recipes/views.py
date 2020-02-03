@@ -195,6 +195,40 @@ def get_new_recipe_by_id(request, id):
         return JsonResponse("Bad Request", status=400, safe=False)
 
 
+def delete_recipe_by_id(request, id):
+
+    if request.method == "DELETE":
+        auth = request.headers.get('Authorization')
+
+        if auth:
+            auth_status = checkauth(auth)
+
+        else:
+            return JsonResponse("please provide login credentials", status=403, safe=False)
+
+        if auth_status == 'success':
+            try:
+                user_obj = User.objects.get(email_address=email)
+                Recipes.objects.get(pk=id, author_id=user_obj.id).delete()
+                return JsonResponse("Recipe Deleted Successfully", status=200, safe=False)
+            except ValidationError:
+                return JsonResponse("No Validate Recipe to delete", status=404, safe=False)
+            except Recipes.DoesNotExist:
+                return JsonResponse("Recipe not Found", status=404, safe=False)
+
+        elif auth_status == "wrong_pwd":
+            return JsonResponse("Wrong Password", status=403, safe=False)
+
+        elif auth_status == "no_user":
+            return JsonResponse("User Not Found", status=404, safe=False)
+
+    if request.method == 'GET':
+        get_new_recipe_by_id(request, id)
+
+    if request.method == 'POST':
+        return JsonResponse("Bad Request", status=400, safe=False)
+
+
 def encryptpwd(pwd):
     salt = bcrypt.gensalt()
     encoded_pwd = pwd.encode('utf-8')
