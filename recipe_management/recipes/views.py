@@ -107,6 +107,7 @@ def update_user(request):
         return JsonResponse("Invalid request method", status=400, safe=False)
 
 
+
 def create_recipe(request):
     if request.method == "POST":
         auth = request.headers.get('Authorization')
@@ -176,6 +177,7 @@ def get_newest_recipe(request):
             return JsonResponse("Recipe not Found", status=404, safe=False)
 
 
+
 def get_new_recipe_byID(request, id):
     if request.method == "GET":
         try:
@@ -187,6 +189,78 @@ def get_new_recipe_byID(request, id):
             return JsonResponse("Recipe not Found", status=404, safe=False)
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
+
+
+def update_recipe(request, id):
+    if request.method == "PUT":
+        auth = request.headers.get('Authorization')
+        if auth:
+            auth_status = checkauth(auth)
+        else:
+            return JsonResponse("please provide login credentials", status=401, safe=False)
+        request_body = json.loads(request.body)
+        if auth_status == 'success':
+            required_params = ['cook_time_in_min', 'prep_time_in_min', 'title', 'cuisine', 'servings', 'ingredients',
+                               'steps', 'nutrition_information']
+            missing_keys = check_params(required_params, request_body)
+            if missing_keys:
+                return JsonResponse("missing {}".format(", ".join(missing_keys)), status=400, safe=False)
+            try:
+                cook_time_in_min = multipleValidator(request_body['cook_time_in_min'], 'cook_time_in_min')
+                prep_time_in_min = multipleValidator(request_body['prep_time_in_min'], 'prep_time_in_min')
+                title = request_body['title']
+                cuisine = request_body['cuisine']
+                servings = minMaxvalidators(request_body['servings'], 1, 5, 'servings')
+                ingredients = uniqueValidator(request_body['ingredients'], 'ingredients')
+                steps = request_body['steps']
+                nutri_info = request_body['nutrition_information']
+                total_time = multipleValidator(cook_time_in_min + prep_time_in_min, 'total_time')
+                for item in steps:
+                    minValidator(item['position'], 1, 'position')
+            except ValidationError as e:
+                return HttpResponse(e, status=400, content_type='application/json')
+
+            user = User.objects.get(email_address=email)
+
+            try:
+                recipe = Recipes.objects.get(pk=id)
+                if not (recipe.author_id == user):
+                    return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
+                else:
+                    nutrition_object = recipe.nutrition_information
+
+                    nutrition_object.calories = nutri_info['calories']
+                    nutrition_object.cholesterol_in_mg = nutri_info['cholesterol_in_mg']
+                    nutrition_object.sodium_in_mg = nutri_info['sodium_in_mg']
+                    nutrition_object.carbohydrates_in_grams = nutri_info['carbohydrates_in_grams']
+                    nutrition_object.protein_in_grams = nutri_info['protein_in_grams']
+                    nutrition_object.save()
+
+                    steps_object = OrderedList.objects.filter(recipe=recipe.id)
+                    steps_object.delete()
+
+                    for item in steps:
+                        order_obj = OrderedList(position=item['position'], items=item['items'], recipe=recipe)
+                        order_obj.save()
+
+                    recipe.cook_time_in_min = cook_time_in_min
+                    recipe.prep_time_in_min = prep_time_in_min
+                    recipe.total_time_in_min = total_time
+                    recipe.title = title
+                    recipe.cuisine = cuisine
+                    recipe.servings = servings
+                    recipe.ingredients = ingredients
+                    recipe.nutrition_information = nutrition_object
+
+                    recipe.save()
+                    serial = RecipeSerializer(recipe)
+                    return JsonResponse(serial.data, status=200)
+            except ValidationError:
+                return JsonResponse("Recipe not Found", status=404, safe=False)
+            except Recipes.DoesNotExist:
+                return JsonResponse("Recipe not Found", status=404, safe=False)
+
+
 
 
 def encryptpwd(pwd):
@@ -229,7 +303,6 @@ def get_auth_status(auth_status):
 
     elif auth_status == 'no_user':
         return JsonResponse("User Not Found", status=404, safe=False)
-
 
 def check_params(req_params, req_body):
     keys = req_body.keys()
