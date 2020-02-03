@@ -97,7 +97,10 @@ def update_user(request):
 
     elif request.method == 'GET':
         auth = request.headers.get('Authorization')
-        auth_status = checkauth(auth)
+        if auth:
+            auth_status = checkauth(auth)
+        else:
+            return JsonResponse("please provide login credentials", status=403, safe=False)
         response = get_auth_status(auth_status)
         return response
     else:
@@ -163,6 +166,28 @@ def create_recipe(request):
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
 
+def get_newest_recipe(request):
+    if request.method == 'GET':
+        try:
+            recipe_obj = Recipes.objects.latest('updated_ts')
+            serialize = RecipeSerializer(recipe_obj)
+            return JsonResponse(serialize.data, status=200)
+        except Recipes.DoesNotExist:
+            return JsonResponse("Recipe not Found", status=404, safe=False)
+
+
+def get_new_recipe_byID(request, id):
+    if request.method == "GET":
+        try:
+            recipe_obj = Recipes.objects.get(pk=id)
+            print(recipe_obj)
+            serlializer = RecipeSerializer(recipe_obj)
+            return JsonResponse(serlializer.data, status=200)
+        except ValidationError:
+            return JsonResponse("Recipe not Found", status=404, safe=False)
+        except Recipes.DoesNotExist:
+            return JsonResponse("Recipe not Found", status=404, safe=False)
+
 
 def encryptpwd(pwd):
     salt = bcrypt.gensalt()
@@ -216,10 +241,3 @@ def check_params(req_params, req_body):
         elif (not req_body[item]):
             missing_keys.append(item)
     return missing_keys
-
-
-def get_newest_recipe(request):
-    if request.method == 'GET':
-        recipe_obj = Recipes.objects.all().order_by('-updated_ts').first()
-        serialize = RecipeSerializer(recipe_obj)
-        return JsonResponse(serialize.data, status=200)
