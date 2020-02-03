@@ -2,13 +2,13 @@ import json
 import bcrypt
 import base64
 from django.db import IntegrityError
-from .serializers import UserSerializer
+from .serializers import UserSerializer, RecipeSerializer, OrderlistSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
 from django.http import HttpResponse
 from django.http import JsonResponse
-from .models import User
+from .models import User, Recipes, OrderedList, NutritionalInformation
 
 email = ""
 
@@ -66,11 +66,7 @@ def update_user(request):
             return JsonResponse("No body Provided", status=204, safe=False)
         if auth_status == 'success':
             required_params = ['first_name', 'last_name', 'password', 'email_address']
-            keys = request_body.keys()
-            missing_keys = []
-            for item in required_params:
-                if item not in keys:
-                    missing_keys.append(item)
+            missing_keys = check_params(required_params, request_body)
             if missing_keys:
                 return HttpResponse("Missing {}".format(", ".join(missing_keys)), status=400,
                                     content_type="application/json")
@@ -109,7 +105,67 @@ def update_user(request):
         auth_status = checkauth(auth)
         response = get_auth_status(auth_status)
         return response
+    else:
+        return JsonResponse("Invalid request method", status=400, safe=False)
 
+def create_recipe(request):
+    if request.method == "POST":
+        auth = request.headers.get('Authorization')
+        auth_status = checkauth(auth)
+        request_body = json.loads(request.body)
+        if auth_status == 'success':
+            required_params = ['cook_time_in_min', 'prep_time_in_min', 'title', 'cuisine', 'servings', 'ingredients',
+                               'steps', 'nutrition_information']
+            missing_keys = check_params(required_params, request_body)
+            if missing_keys:
+                return JsonResponse("missing {}".format(", ".join(missing_keys)), status=400, safe=False)
+
+            cook_time_in_min = request_body['cook_time_in_min']
+            prep_time_in_min = request_body['prep_time_in_min']
+            title = request_body['title']
+            cuisine = request_body['cuisine']
+            servings = request_body['servings']
+            ingredients = request_body['ingredients']
+            steps = request_body['steps']
+            nutri_info = request_body['nutrition_information']
+            total_time = cook_time_in_min + prep_time_in_min
+
+            author = User.objects.get(email_address=email)
+
+            nutrition_obj = NutritionalInformation(calories=nutri_info['calories'],
+                                                   cholesterol_in_mg=nutri_info['cholesterol_in_mg'],
+                                                   sodium_in_mg=nutri_info['sodium_in_mg'],
+                                                   carbohydrates_in_grams=nutri_info['carbohydrates_in_grams'],
+                                                   protein_in_grams=nutri_info['protein_in_grams'])
+            nutrition_obj.save()
+
+
+
+            recipe_obj = Recipes(author_id=author, cook_time_in_min=cook_time_in_min, prep_time_in_min=prep_time_in_min,
+                                 total_time_in_min=total_time, title=title, cuisine=cuisine, servings=servings,
+                                 ingredients=ingredients, nutrition_information=nutrition_obj)
+            recipe_obj.save()
+
+            for item in steps:
+                order_obj = OrderedList(position=item['position'], items=item['items'], recipe=recipe_obj)
+                order_obj.save()
+
+
+
+            # query_set = OrderedList.objects.filter(recipe=recipe_obj.id).values()
+            # serial = OrderlistSerializer(query_set, many=True)
+            #
+            # recipe_obj.steps = serial
+            # recipe_obj.save()
+
+            ser = RecipeSerializer(recipe_obj)
+
+            return JsonResponse(ser.data, status=201)
+
+        elif auth_status == "wrong_pwd":
+            return JsonResponse("Wrong Password", status=403, safe=False)
+        elif auth_status == "no_user":
+            return JsonResponse("User Not Found", status=404, safe=False)
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
 
@@ -155,3 +211,12 @@ def get_auth_status(auth_status):
 
     elif auth_status == 'no_user':
         return JsonResponse("User Not Found", status=404, safe=False)
+
+def check_params(req_params, req_body):
+    keys = req_body.keys()
+    missing_keys = []
+    for item in req_params:
+        if item not in keys:
+            missing_keys.append(item)
+    return missing_keys
+
