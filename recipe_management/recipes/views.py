@@ -2,7 +2,7 @@ import json
 import bcrypt
 import base64
 from django.db import IntegrityError
-from .serializers import UserSerializer
+from .serializers import UserSerializer, GetUserSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.validators import RegexValidator
@@ -147,7 +147,7 @@ def get_auth_status(auth_status):
 
     if auth_status == 'success':
         user_obj = User.objects.get(email_address=email)
-        serialize = UserSerializer(user_obj)
+        serialize = GetUserSerializer(user_obj)
         return JsonResponse(serialize.data, status=200)
 
     elif auth_status == 'wrong_pwd':
