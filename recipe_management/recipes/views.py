@@ -210,11 +210,11 @@ def delete_recipe_by_id(request, id):
             try:
                 user_obj = User.objects.get(email_address=email)
                 Recipes.objects.get(pk=id, author_id=user_obj.id).delete()
-                return JsonResponse("Recipe Deleted Successfully", status=200, safe=False)
+                return JsonResponse("Recipe Deleted Successfully", status=204, safe=False)
             except ValidationError:
-                return JsonResponse("No Validate Recipe to delete", status=404, safe=False)
+                return JsonResponse("No Validate Recipe found to delete", status=404, safe=False)
             except Recipes.DoesNotExist:
-                return JsonResponse("Recipe not Found", status=404, safe=False)
+                return JsonResponse("You are not authorized to delete this.", status=401, safe=False)
 
         elif auth_status == "wrong_pwd":
             return JsonResponse("Wrong Password", status=403, safe=False)
