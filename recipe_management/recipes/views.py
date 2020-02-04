@@ -11,6 +11,7 @@ from .models import User, Recipes, OrderedList, NutritionalInformation
 
 email = ""
 
+
 def user(request):
     if request.method == 'POST':
         request_body = json.loads(request.body)
