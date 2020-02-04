@@ -121,7 +121,6 @@ def get_user(request):
         return JsonResponse("User Not Found", status=404, safe=False)
 
 
-
 def create_recipe(request):
     if request.method == "POST":
         auth = request.headers.get('Authorization')
@@ -145,6 +144,7 @@ def create_recipe(request):
                 servings = minMaxvalidators(request_body['servings'], 1, 5, 'servings')
                 ingredients = uniqueValidator(request_body['ingredients'], 'ingredients')
                 steps = request_body['steps']
+                steps_sort = sorted(steps, key=lambda k: k['position'], reverse=True)
                 nutri_info = request_body['nutrition_information']
                 total_time = multipleValidator(cook_time_in_min + prep_time_in_min, 'total_time')
                 for item in steps:
@@ -166,7 +166,7 @@ def create_recipe(request):
                                  ingredients=ingredients, nutrition_information=nutrition_obj)
             recipe_obj.save()
 
-            for item in steps:
+            for item in steps_sort:
                 order_obj = OrderedList(position=item['position'], items=item['items'], recipe=recipe_obj)
                 order_obj.save()
 
@@ -261,9 +261,10 @@ def update_recipe(request, id, auth):
             servings = minMaxvalidators(request_body['servings'], 1, 5, 'servings')
             ingredients = uniqueValidator(request_body['ingredients'], 'ingredients')
             steps = request_body['steps']
+            steps_sort = sorted(steps, key=lambda k: k['position'], reverse=True)
             nutri_info = request_body['nutrition_information']
             total_time = multipleValidator(cook_time_in_min + prep_time_in_min, 'total_time')
-            for item in steps:
+            for item in steps_sort:
                 minValidator(item['position'], 1, 'position')
         except ValidationError as e:
             return HttpResponse(e, status=400, content_type='application/json')
