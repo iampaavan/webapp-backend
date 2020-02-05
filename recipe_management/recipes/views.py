@@ -1,4 +1,5 @@
 import json
+import random
 import bcrypt
 import base64
 from django.db import IntegrityError
@@ -187,6 +188,20 @@ def get_newest_recipe(request):
         try:
             recipe_obj = Recipes.objects.latest('updated_ts')
             serialize = RecipeSerializer(recipe_obj)
+            return JsonResponse(serialize.data, status=200)
+        except Recipes.DoesNotExist:
+            return JsonResponse("Recipe not Found", status=404, safe=False)
+
+    else:
+        return JsonResponse("Bad Request", status=400, safe=False)
+
+
+def get_random_recipe(request):
+    if request.method == 'GET':
+        try:
+            recipe_obj = Recipes.objects.all()
+            random_item = random.choice(recipe_obj)
+            serialize = RecipeSerializer(random_item)
             return JsonResponse(serialize.data, status=200)
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
