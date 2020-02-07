@@ -14,6 +14,13 @@ pipeline
 
 	  stages
 	  {
+ 			stage('Git Credentials')
+ 			{
+ 		   steps
+ 		   		{
+ 						checkout scm
+ 					}
+ 		}
 		stage('Build Docker Image')
 		{
 			steps
