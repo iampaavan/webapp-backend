@@ -5,18 +5,15 @@ pipeline
 			registry = credentials("docker_registery")
 			registryCredential = 'dockerhub'
 			dockerImage = ''
+			CC = """${sh(
+                returnStdout: true,
+                script: 'echo "clang"'
+            )}"""
 	  }
 	  agent any
 
 	  stages
 	  {
-// 		stage('Git Credentials')
-// 		{
-// 		   steps
-// 		   {
-// 				git([url: 'https://github.com/CSYE-7374-Advanced-Cloud-Computing/webapp-backend.git', branch: 'assignment4', credentialsId: 'github'])
-// 			}
-// 		}
 		stage('Build Docker Image')
 		{
 			steps
@@ -24,6 +21,7 @@ pipeline
 			    checkout scm
 				script
 				{
+				        sh 'printenv'
 						dockerImage = docker.build registry + ":$BUILD_NUMBER"
 				}
 			}
