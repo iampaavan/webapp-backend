@@ -7,7 +7,7 @@ pipeline
 			dockerImage = ''
 			CC = """${sh(
                 returnStdout: true,
-                script: 'echo "clang"'
+                script: 'git rev-parse HEAD'
             )}"""
 	  }
 	  agent any
