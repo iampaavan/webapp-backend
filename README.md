@@ -10,3 +10,5 @@ Recipe Management System:
 6) A user should be able to get his account details only after successful login.
 7) A user should be able to delete his recipe only after successful login.
 8) Anybody can access the url to get the particular recipe.
+
+Docker:
