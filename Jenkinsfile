@@ -27,7 +27,7 @@ pipeline
 			{
 				script
 				{
-					dockerImage = docker.build("${GIT_COMMIT}")
+					dockerImage = docker.build("${registry}:${GIT_COMMIT}")
 				}
 			}
 		}
