@@ -8,7 +8,7 @@ pipeline
 			GIT_COMMIT = """${sh(
                 returnStdout: true,
                 script: 'git rev-parse HEAD'
-            )}"""
+            ).trim()}"""
 	  }
 	  agent any
 
@@ -27,7 +27,7 @@ pipeline
 			{
 				script
 				{
-					dockerImage = docker.build("foo", "--build-arg vcs-ref=${GIT_COMMIT} .")
+					dockerImage = docker.build("${GIT_COMMIT}")
 				}
 			}
 		}
