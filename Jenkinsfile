@@ -23,10 +23,7 @@ pipeline
 			{
 				script
 				{
-					dir("/var/lib/jenkins/workspace/docker-test/recipe_management/")
-					{
 						dockerImage = docker.build registry + ":$BUILD_NUMBER"
-					}
 				}
 			}
 		}
