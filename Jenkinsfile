@@ -5,7 +5,7 @@ pipeline
 			registry = credentials("docker_registery")
 			registryCredential = 'dockerhub'
 			dockerImage = ''
-			CC = """${sh(
+			GIT_COMMIT = """${sh(
                 returnStdout: true,
                 script: 'git rev-parse HEAD'
             )}"""
@@ -28,7 +28,7 @@ pipeline
 				script
 				{
 				        sh 'printenv'
-						dockerImage = docker.build registry + ":$BUILD_NUMBER"
+						dockerImage = docker.build registry + ":$GIT_COMMIT"
 				}
 			}
 		}
