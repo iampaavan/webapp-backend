@@ -2,7 +2,7 @@ pipeline
 	{
 	  environment
 	  {
-			registry = "hemalgadhiya/csye-7374-advanced-cloud-webapp-backend"
+			registry = credentials("docker_registery")
 			registryCredential = 'dockerhub'
 			dockerImage = ''
 	  }
