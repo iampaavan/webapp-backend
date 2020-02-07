@@ -27,7 +27,7 @@ pipeline
 			{
 				script
 				{
-					dockerImage = docker.build("${GIT_COMMIT}", "--file='Dockerfile'")
+					dockerImage = docker.build("foo", "--build-arg vcs-ref=${GIT_COMMIT} .")
 				}
 			}
 		}
