@@ -1,0 +1,5 @@
+Django>=2.0,<3.0
+django-cors-headers>=3.0
+psycopg2-binary>=2.8
+bcrypt>=1.0
+djangorestframework>=3.10
