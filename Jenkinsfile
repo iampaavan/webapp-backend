@@ -10,7 +10,7 @@ pipeline
 
 	  stages
 	  {
-		stage('Git Credentials Stage')
+		stage('Git Credentials')
 		{
 		   steps
 		   {
