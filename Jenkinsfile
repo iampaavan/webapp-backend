@@ -25,7 +25,6 @@ pipeline
 		{
 			steps
 			{
-			    checkout scm
 				script
 				{
 				        sh 'printenv'
