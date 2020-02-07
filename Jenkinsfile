@@ -14,7 +14,7 @@ pipeline
 
 	  stages
 	  {
- 			stage('Git Credentials')
+ 			stage('Git Checkout')
  			{
  		   steps
  		   		{
