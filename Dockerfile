@@ -7,8 +7,6 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ARG vcs-ref=0
-ENV vcs-ref=$vcs-ref
 
 # install dependencies
 RUN pip install --upgrade pip

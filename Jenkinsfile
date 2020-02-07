@@ -21,29 +21,28 @@ pipeline
  						checkout scm
  					}
  		}
-		stage('Build Docker Image')
-		{
-			steps
+			stage('Build Docker Image')
 			{
-				script
+				steps
 				{
-					dockerImage = docker.build("${registry}:${GIT_COMMIT}")
+					script
+					{
+						dockerImage = docker.build("${registry}:${GIT_COMMIT}")
+					}
 				}
 			}
-		}
-		stage('Deploy Docker Image')
-		{
-			steps
+			stage('Deploy Docker Image')
 			{
-				 script
-				 {
-					docker.withRegistry( '', registryCredential )
-						{
-							dockerImage.push()
-						}
-				 }
+				steps
+				{
+					 script
+					 {
+						docker.withRegistry( '', registryCredential )
+							{
+								dockerImage.push()
+							}
+					 }
+				}
 			}
-		}
 	}
-
 }
