@@ -10,13 +10,13 @@ pipeline
 
 	  stages
 	  {
-// 		stage('Git Credentials')
-// 		{
-// 		   steps
-// 		   {
-// 				git([url: 'https://github.com/CSYE-7374-Advanced-Cloud-Computing/webapp-backend.git', branch: 'assignment4', credentialsId: 'github'])
-// 			}
-// 		}
+ 			stage('Git Credentials')
+ 			{
+ 		   steps
+ 		   		{
+ 						checkout scm
+ 					}
+ 		}
 		stage('Build Docker Image')
 		{
 			steps
