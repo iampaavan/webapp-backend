@@ -11,16 +11,16 @@ services:
     env_file:
       - ./.env
 
-#     depends_on:
-#       - db
-#   db:
-#     image: postgres:12
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data/
-#     environment:
-#       - POSTGRES_USER=postgres
-#       - POSTGRES_PASSWORD=root
-#       - POSTGRES_DB=recipe
-#
-# volumes:
-#   postgres_data:
+    depends_on:
+      - db
+  db:
+    image: postgres:12
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=recipe
+
+volumes:
+  postgres_data:
