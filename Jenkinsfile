@@ -27,7 +27,7 @@ pipeline
 				}
 			}
 		}
-		stage('Deploy Image')
+		stage('Deploy Docker Image')
 		{
 			steps
 			{
