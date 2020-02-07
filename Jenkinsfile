@@ -10,7 +10,6 @@ pipeline
 
 	  stages
 	  {
-	        checkout scm
 // 		stage('Git Credentials')
 // 		{
 // 		   steps
@@ -22,6 +21,7 @@ pipeline
 		{
 			steps
 			{
+			    checkout scm
 				script
 				{
 						dockerImage = docker.build registry + ":$BUILD_NUMBER"
