@@ -27,8 +27,7 @@ pipeline
 			{
 				script
 				{
-				        sh 'printenv'
-						dockerImage = docker.build("my-image:${GIT_COMMIT}")
+						def dockerImage = docker.build("${GIT_COMMIT}")
 				}
 			}
 		}
