@@ -11,7 +11,6 @@ pipeline
             ).trim()}"""
 	  }
 	  agent any
-
 	  stages
 	  {
  			stage('Git Checkout')
