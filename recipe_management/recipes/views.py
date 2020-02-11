@@ -209,6 +209,12 @@ def get_random_recipe(request):
     else:
         return JsonResponse("Bad Request", status=400, safe=False)
 
+def health_check(request):
+    if request.method == 'GET':
+        return JsonResponse(status=200)
+    else:
+        return JsonResponse(status=400)
+
 
 def get_new_recipe_by_id(request, id):
     try:

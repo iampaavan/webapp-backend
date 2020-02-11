@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: django-backend
+  namespace: api
+  labels:
+    app: recipe
+
+spec:
+  # modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels:
+      app: django-backend
+
+  template:
+    metadata:
+      labels:
+        app: django-backend
+
+    spec:
+      containers:
+      - name: django-backend-app
+        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:63b14ae4504ea15584b62bdaaf7f63a0d47c3e15
+        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: "1000m"
+          limits:
+            cpu: "1000m"
+        ports:
+           - { containerPort: 5000, protocol: TCP}            
+      imagePullSecrets:
+      - name: dockercreds
