@@ -8,7 +8,7 @@ spec:
   - name: http
     protocol: TCP
     port: 80
-    targetPort: 5000
+    targetPort: 8080
   selector:
     app: django-backend
   type: LoadBalancer

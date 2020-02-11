@@ -30,6 +30,9 @@ spec:
           limits:
             cpu: "1000m"
         ports:
-           - { containerPort: 5000, protocol: TCP}
+           - { containerPort: 8080, protocol: TCP}
+        envFrom:
+        - configMapRef:
+           name: ConfigMap
       imagePullSecrets:
       - name: dockercreds
