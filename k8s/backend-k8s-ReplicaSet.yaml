@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:621effe27d56ba092e159b3a6e7b0d0123d2cf33
+        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:a8b97e6eef9826926a0e1de15b09a388d78e711f
         command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
         imagePullPolicy: IfNotPresent
         resources:
@@ -30,9 +30,9 @@ spec:
           limits:
             cpu: "1000m"
         ports:
-           - { containerPort: 8080, protocol: TCP}
+           - containerPort: 8080
         envFrom:
         - configMapRef:
-           name: ConfigMap
+           name: configmap
       imagePullSecrets:
       - name: dockercreds

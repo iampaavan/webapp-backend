@@ -2,12 +2,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ConfigMap
+  name: configmap
   namespace: api
 data:
-    NODE_ENV: DEV
     PORT: "8080"
-    DB_HOST: "TBD"
+    DB_HOST: "postgres-rds-instance.cwpqjddg8qrr.us-east-1.rds.amazonaws.com"
     DB_USER: "postgres"
     DB_PASS: "rootroot"
     DB_PORT: "5432"
