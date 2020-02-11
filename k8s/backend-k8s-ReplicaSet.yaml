@@ -4,7 +4,7 @@ metadata:
   name: django-backend
   namespace: api
   labels:
-    app: recipe
+    app: django-backend
 
 spec:
   # modify replicas according to your case
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:63b14ae4504ea15584b62bdaaf7f63a0d47c3e15
+        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:621effe27d56ba092e159b3a6e7b0d0123d2cf33
         command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
         imagePullPolicy: IfNotPresent
         resources:
@@ -30,6 +30,6 @@ spec:
           limits:
             cpu: "1000m"
         ports:
-           - { containerPort: 5000, protocol: TCP}            
+           - { containerPort: 5000, protocol: TCP}
       imagePullSecrets:
       - name: dockercreds
