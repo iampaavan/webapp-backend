@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:a8b97e6eef9826926a0e1de15b09a388d78e711f
+        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:50da82aad30f2a46e1ad4aef090f9ff9eb45d250
         command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
         imagePullPolicy: IfNotPresent
         resources:
