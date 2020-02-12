@@ -84,8 +84,8 @@ DATABASES = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
         'NAME': os.environ.get("SQL_DATABASE", "recipe"),
         'USER': os.environ.get("SQL_USER", "postgres"),
-        'PASSWORD': os.environ.get("SQL_PASSWORD", "root"),
-        'HOST': os.environ.get("SQL_HOST", "localhost"),
+        'PASSWORD': os.environ.get("SQL_PASSWORD", "rootroot"),
+        'HOST': os.environ.get("SQL_HOST", "postgres-rds-instance.cwpqjddg8qrr.us-east-1.rds.amazonaws.com"),
         'PORT': os.environ.get("SQL_PORT", "5432")
     }
 }
