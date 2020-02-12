@@ -20,7 +20,7 @@ COPY . /usr/src/app/
 EXPOSE 8080
 RUN pwd
 RUN ls -lrt
-RUN cd recipe_management/
+CMD ["cd" "recipe_management/"]
 
 RUN pwd
 RUN ls -lrt
