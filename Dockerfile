@@ -22,3 +22,7 @@ WORKDIR "recipe_management/"
 
 RUN pwd
 RUN ls -lrt
+
+RUN python manage.py makemigrations recipes
+RUN python manage.py migrate
+RUN python manage.py runserver
