@@ -16,3 +16,7 @@ RUN pip install -r requirements.txt
 
 # copy project
 COPY . /usr/src/app/
+
+EXPOSE 8080
+RUN pwd
+RUN ls -lrt
