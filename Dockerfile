@@ -18,7 +18,7 @@ RUN pip install -r requirements.txt
 COPY . /usr/src/app/
 
 EXPOSE 8080
-WORKDIR "recipe_management/"
+EXPOSE 5432
 
-RUN python manage.py migrate
-RUN python manage.py runserver
+RUN docker-compose up -d --build
+RUN docker-compose exec web python manage.py migrate --noinput
