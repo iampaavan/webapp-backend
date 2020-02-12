@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-backend
+  namespace: api
+spec:
+  template:
+    spec:
+      containers:
+      - name: django-backend-app
+        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:f4ec8938ebf17746520ef180ae728b735f5662dd
+        command: ["python",  "manage.py", "migrate"]
+      restartPolicy: Never
+  backoffLimit: 4
