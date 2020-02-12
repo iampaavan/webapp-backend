@@ -18,9 +18,7 @@ RUN pip install -r requirements.txt
 COPY . /usr/src/app/
 
 EXPOSE 8080
-RUN pwd
-RUN ls -lrt
-CMD ["cd" "recipe_management/"]
+WORKDIR "recipe_management/"
 
 RUN pwd
 RUN ls -lrt
