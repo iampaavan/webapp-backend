@@ -6,7 +6,7 @@ metadata:
   namespace: api
 data:
     PORT: "8080"
-    DB_HOST: "postgres-rds-instance.cwpqjddg8qrr.us-east-1.rds.amazonaws.com"
+    DB_HOST: "postgres-rds-instance.crhih3bwnzav.us-east-1.rds.amazonaws.com"
     DB_USER: "postgres"
     DB_PASS: "rootroot"
     DB_PORT: "5432"
