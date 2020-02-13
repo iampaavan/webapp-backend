@@ -14,10 +14,12 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN pip install -r requirements.txt
 
-
 # copy project
 COPY . /usr/src/app/
 
 WORKDIR /usr/src/app/recipe_management
 
-CMD python manage.py runserver
+EXPOSE 8000
+RUN pwd
+RUN ls
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
