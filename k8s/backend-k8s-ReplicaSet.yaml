@@ -21,8 +21,8 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:96d4de658056295a63a988bbc8aafa9886d3938a
-        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:f5635ac5114a61b2b4477d6df5e3962975ec2516
+#        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
         imagePullPolicy: IfNotPresent
         ports:
            - containerPort: 8080
