@@ -19,7 +19,6 @@ FROM nginx:1.15
 COPY --from=build-stage /usr/src/app/recipe_management.conf /etc/nginx/sites-available/recipe_management.conf
 RUN ln -s /etc/nginx/sites-available/recipe_management.conf /etc/nginx/sites-enabled
 RUN service nginx restart
-RUN ["nginx", "-g", "daemon off;"]
 
 FROM build-stage as build2
 RUN chmod 777 entrypoint.sh
