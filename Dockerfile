@@ -19,7 +19,4 @@ COPY . /usr/src/app/
 
 WORKDIR /usr/src/app/recipe_management
 
-EXPOSE 8000
-RUN pwd
-RUN ls
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
