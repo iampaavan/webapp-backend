@@ -81,12 +81,12 @@ WSGI_APPLICATION = 'recipe_management.wsgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
-        'NAME': os.environ.get("SQL_DATABASE", "recipe"),
-        'USER': os.environ.get("SQL_USER", "postgres"),
-        'PASSWORD': os.environ.get("SQL_PASSWORD", "rootroot"),
-        'HOST': os.environ.get("SQL_HOST", "postgres-rds-instance.cwpqjddg8qrr.us-east-1.rds.amazonaws.com"),
-        'PORT': os.environ.get("SQL_PORT", "5432")
+        "ENGINE": "django.db.backends.postgresql",
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
+        'PASSWORD': os.environ.get("DB_PASS"),
+        'HOST': os.environ.get("DB_HOST"),
+        'PORT': os.environ.get("DB_PORT"),
     }
 }
 

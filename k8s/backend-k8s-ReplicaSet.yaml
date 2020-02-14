@@ -17,15 +17,14 @@ spec:
     metadata:
       labels:
         app: django-backend
-
     spec:
       containers:
       - name: django-backend-app
-        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:f4ec8938ebf17746520ef180ae728b735f5662dd
-        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:a787201fdedc53818f67ec5bb1ad96e2fe7635e6
+#        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
         imagePullPolicy: IfNotPresent
         ports:
-           - containerPort: 8080
+           - containerPort: 8000
         envFrom:
         - configMapRef:
            name: configmap
