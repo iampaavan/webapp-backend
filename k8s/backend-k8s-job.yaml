@@ -8,10 +8,12 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:f5635ac5114a61b2b4477d6df5e3962975ec2516
-        command: ["python",  "manage.py", "migrate", "--noinput"]
+        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:a787201fdedc53818f67ec5bb1ad96e2fe7635e6
+        command: ["python",  "manage.py", "migrate"]
         envFrom:
           - configMapRef:
               name: configmap
+      imagePullSecrets:
+        - name: dockercreds
       restartPolicy: Never
   backoffLimit: 4
