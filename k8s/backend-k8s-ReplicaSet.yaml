@@ -1,31 +1,25 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: django-backend
+  name: django-backend-app
   namespace: api
-  labels:
-    app: django-backend
-
 spec:
   # modify replicas according to your case
   replicas: 3
   selector:
     matchLabels:
-      app: django-backend
-
+      app: django-backend-app
   template:
     metadata:
       labels:
-        app: django-backend
-
+        app: django-backend-app
     spec:
       containers:
       - name: django-backend-app
-        image: iampaavan/csye-7374-advanced-cloud-webapp-backend:f4ec8938ebf17746520ef180ae728b735f5662dd
-        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:e727b63194337deddd4d1a63e08e0431cb4eb274
         imagePullPolicy: IfNotPresent
         ports:
-           - containerPort: 8080
+           - containerPort: 8000
         envFrom:
         - configMapRef:
            name: configmap
