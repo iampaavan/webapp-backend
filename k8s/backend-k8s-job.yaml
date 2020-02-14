@@ -10,5 +10,10 @@ spec:
       - name: django-backend-app
         image: iampaavan/csye-7374-advanced-cloud-webapp-backend:f4ec8938ebf17746520ef180ae728b735f5662dd
         command: ["python",  "manage.py", "migrate"]
+        envFrom:
+          - configMapRef:
+              name: configmap
+      imagePullSecrets:
+        - name: dockercreds
       restartPolicy: Never
   backoffLimit: 4
