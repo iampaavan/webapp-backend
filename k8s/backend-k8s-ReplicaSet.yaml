@@ -19,7 +19,20 @@ spec:
         image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:e727b63194337deddd4d1a63e08e0431cb4eb274
         imagePullPolicy: IfNotPresent
         ports:
-           - containerPort: 8000
+        - name: liveness-port
+          containerPort: 8000
+          hostPort: 80
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 80
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /v1/health
+            port: liveness-port
+          initialDelaySeconds: 80
+          periodSeconds: 3
         envFrom:
         - configMapRef:
            name: configmap
