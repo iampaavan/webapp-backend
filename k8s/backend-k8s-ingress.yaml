@@ -12,8 +12,8 @@ spec:
         - path: /v1/user
           backend:
             serviceName: django-backend
-            servicePort: 8080
+            servicePort: 8000
         - path: /v1/recipe/
           backend:
             serviceName: django-backend
-            servicePort: 8080
+            servicePort: 8000
