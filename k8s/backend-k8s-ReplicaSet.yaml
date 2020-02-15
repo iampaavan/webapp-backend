@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: username/docker:81750055651bbe6db78ac1828abd43144f08213e
+        image: username/clock:81750055651bbe6db78ac1828abd43144f08213e
         imagePullPolicy: IfNotPresent
         ports:
         - name: liveness-port
