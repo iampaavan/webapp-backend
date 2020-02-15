@@ -19,7 +19,20 @@ spec:
         image: username/image:81750055651bbe6db78ac1828abd43144f08213e
         imagePullPolicy: IfNotPresent
         ports:
-           - containerPort: 8000
+        - name: liveness-port
+          containerPort: 8000
+          hostPort: 80
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 80
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /v1/health
+            port: liveness-port
+          initialDelaySeconds: 80
+          periodSeconds: 3
         envFrom:
         - configMapRef:
            name: configmap
