@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:e727b63194337deddd4d1a63e08e0431cb4eb274
+        image: username/image:81750055651bbe6db78ac1828abd43144f08213e
         imagePullPolicy: IfNotPresent
         ports:
         - name: liveness-port

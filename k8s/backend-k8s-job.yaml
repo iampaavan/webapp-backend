@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
       - name: django-backend-app
-        image: hemalgadhiya/csye-7374-advanced-cloud-webapp-backend:d455cdfa567cfcd7bd5eca40c1926b1a850c3a59
+        image: username/image:81750055651bbe6db78ac1828abd43144f08213e
         command: ["python",  "./recipe_management/manage.py", "migrate"]
         envFrom:
           - configMapRef:
