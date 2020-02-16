@@ -4,7 +4,6 @@ metadata:
   name: configmap
   namespace: api
 data:
-    PORT: "8000"
     DB_HOST: "RDS_URL"
     DB_USER: "postgres"
     DB_PASS: "rootroot"

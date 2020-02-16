@@ -18,4 +18,6 @@ cd ~/csye7374/webapp-backend/k8s
 
 sed -i "s/secret/$base64/g" ~/csye7374/webapp-backend/k8s/backend-k8s-secrets.yaml
 
-sed -i "s/RDS_URL/$3/g" backend-k8s-configMap.yaml
+url=$(echo -n $3 | base64 -w 0)
+
+sed -i "s/RDS_URL/$url/g" ~/csye7374/webapp-backend/k8s/backend-k8s-secrets_db.yaml

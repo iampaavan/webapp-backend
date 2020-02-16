@@ -10,9 +10,37 @@ spec:
       - name: django-backend-app
         image: username/clock:81750055651bbe6db78ac1828abd43144f08213e
         command: ["python",  "./recipe_management/manage.py", "migrate"]
-        envFrom:
-          - configMapRef:
-              name: configmap
+        env:
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_HOST
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_USER
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_USER
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_PASS
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_PORT
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_NAME
       imagePullSecrets:
         - name: dockercreds
       restartPolicy: Never
