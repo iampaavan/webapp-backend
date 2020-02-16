@@ -1,0 +1,31 @@
+---
+# tasks file for deploy-app
+
+- name: run shell scrip
+  script: ~/csye7374/webapp-backend/k8s/change_imagetag.sh "{{username}}" "{{image}}" "{{rds_url}}"
+
+- name: create namespace
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-namespace.yaml"
+
+- name: create secret
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-secrets.yaml"
+
+- name: create config map
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-configMap.yaml"
+
+- name: create config map
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-job.yaml"
+
+- name: sleep for 40 seconds and continue with play
+  wait_for:
+    sleep: 40
+
+- name: create replica set
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-ReplicaSet.yaml"
+
+- name: sleep for 100 seconds and continue with play
+  wait_for:
+    sleep: 100
+
+- name: create service
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-service.yaml"
