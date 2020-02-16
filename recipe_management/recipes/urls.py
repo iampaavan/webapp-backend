@@ -7,6 +7,7 @@ urlpatterns = [
     path('recipe/', views.create_recipe),
     path('recipes', views.get_newest_recipe),
     path('recipe/<id>', views.recipe_crud),
-    path('get/random/recipe', views.get_random_recipe)
+    path('get/random/recipe', views.get_random_recipe),
+    path('health', views.health_check)
 
 ]

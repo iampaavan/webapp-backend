@@ -84,7 +84,7 @@ def update_user(request):
                     changed = True
                     continue
                 elif request_body['email_address'] != user_obj.email_address:
-                    return HttpResponse("Email address cannot be updated", status=400)
+                    return HttpResponse("Email address cannot be updated", status=400, content_type='application/json')
             if changed:
                 ser = UserSerializer(user_obj)
                 user_obj.save()
@@ -208,6 +208,13 @@ def get_random_recipe(request):
 
     else:
         return JsonResponse("Bad Request", status=400, safe=False)
+
+
+def health_check(request):
+    if request.method == 'GET':
+        return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
+    else:
+        return HttpResponse("Abort", status=400, content_type='application/json')
 
 
 def get_new_recipe_by_id(request, id):

@@ -11,7 +11,6 @@ pipeline
             ).trim()}"""
 	  }
 	  agent any
-
 	  stages
 	  {
  			stage('Git Checkout')
@@ -31,7 +30,7 @@ pipeline
 					}
 				}
 			}
-			stage('Deploy Docker Image')
+			stage('Deploy Docker Image to DockerHub')
 			{
 				steps
 				{

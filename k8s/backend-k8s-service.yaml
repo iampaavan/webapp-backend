@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-backend-app
+  namespace: api
+spec:
+  selector:
+    app: django-backend-app
+  ports:
+    - name: my-service
+      protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer

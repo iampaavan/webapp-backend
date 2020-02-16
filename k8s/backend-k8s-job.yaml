@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-backend
+  namespace: api
+spec:
+  template:
+    spec:
+      containers:
+      - name: django-backend-app
+        image: username/clock:81750055651bbe6db78ac1828abd43144f08213e
+        command: ["python",  "./recipe_management/manage.py", "migrate"]
+        envFrom:
+          - configMapRef:
+              name: configmap
+      imagePullSecrets:
+        - name: dockercreds
+      restartPolicy: Never
+  backoffLimit: 4
