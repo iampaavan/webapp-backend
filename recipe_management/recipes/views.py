@@ -188,6 +188,7 @@ def create_recipe(request):
 
 
 def upload_image(request, id):
+    region = 'us-east-1'
     try:
         if request.method == "POST":
             auth = request.headers.get('Authorization')
@@ -197,13 +198,13 @@ def upload_image(request, id):
                 recipe_obj = Recipes.objects.get(pk=id)
                 try:
                     file_name = file.name
-                    s3_bucket = "dev-hgadhiya-csye7374-image-upload"
+                    s3_bucket = "dev-csye7374-django-backend-recipe-management"
                     s3_client = boto3.client(
                         's3',
-                        aws_access_key_id="AKIAUJWRCG77QYGIF35U",
-                        aws_secret_access_key="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")
+                        aws_access_key_id="AKIAY2TPSKG7XT2RWQOM",
+                        aws_secret_access_key="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")
                     s3_client.upload_fileobj(file, s3_bucket, file_name)
-                    s3_url = f"https://{s3_bucket}.s3.amazonaws.com/{file_name}"
+                    s3_url = f"https://s3.{region}.amazonaws.com/{s3_bucket}/{file_name}"
 
                     img_object = Image(urls=s3_url, recipe=recipe_obj)
                     img_object.save()
@@ -213,7 +214,6 @@ def upload_image(request, id):
                 return JsonResponse(ser.data, status=200)
     except Exception as e:
         print(e)
-
 
 
 def get_newest_recipe(request):
