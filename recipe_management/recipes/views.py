@@ -1,14 +1,15 @@
 import json
+import boto3
 import random
 import bcrypt
 import base64
 from django.db import IntegrityError
-from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer
+from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer, ImageSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.http import HttpResponse, JsonResponse
 from .validators import multipleValidator, minMaxvalidators, minValidator, uniqueValidator
-from .models import User, Recipes, OrderedList, NutritionalInformation
+from .models import User, Recipes, OrderedList, NutritionalInformation, Image
 
 email = ""
 
@@ -123,6 +124,7 @@ def get_user(request):
 
 
 def create_recipe(request):
+
     if request.method == "POST":
         auth = request.headers.get('Authorization')
         if auth:
@@ -181,6 +183,35 @@ def create_recipe(request):
             return JsonResponse("User Not Found", status=404, safe=False)
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
+
+
+def upload_image(request, id):
+    try:
+        if request.method == "POST":
+            auth = request.headers.get('Authorization')
+            file = request.FILES['file']
+            auth_status = checkauth(auth)
+            if auth_status == "success":
+                recipe_obj = Recipes.objects.get(pk=id)
+                try:
+                    file_name = file.name
+                    s3_bucket = "dev-hgadhiya-csye7374-image-upload"
+                    s3_client = boto3.client(
+                        's3',
+                        aws_access_key_id="AKIAUJWRCG77QYGIF35U",
+                        aws_secret_access_key="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")
+                    s3_client.upload_fileobj(file, s3_bucket, file_name)
+                    s3_url = f"https://{s3_bucket}.s3.amazonaws.com/{file_name}"
+
+                    img_object = Image(urls=s3_url, recipe=recipe_obj)
+                    img_object.save()
+                    ser = ImageSerializer(img_object)
+                except Exception as e:
+                    print(e)
+                return JsonResponse(ser.data, status=200)
+    except Exception as e:
+        print(e)
+
 
 
 def get_newest_recipe(request):
@@ -335,7 +366,6 @@ def update_recipe(request, id, auth):
         return JsonResponse("Wrong Password", status=403, safe=False)
     elif auth_status == "no_user":
         return JsonResponse("User Not Found", status=404, safe=False)
-
 
 def encryptpwd(pwd):
     salt = bcrypt.gensalt()

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Recipes, OrderedList, NutritionalInformation
+from .models import User, Recipes, OrderedList, NutritionalInformation, Image
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,13 +29,20 @@ class NutritionaInfoSerializer(serializers.ModelSerializer):
         model = NutritionalInformation
         fields = ['calories', 'cholesterol_in_mg', 'sodium_in_mg', 'carbohydrates_in_grams', 'protein_in_grams']
 
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ['id', 'urls']
+
 
 class RecipeSerializer(serializers.ModelSerializer):
 
     steps = OrderlistSerializer(many=True)
     nutrition_information = NutritionaInfoSerializer()
+    images = ImageSerializer(many=True)
 
     class Meta:
         model = Recipes
         fields = ['id', 'created_ts', 'updated_ts', 'author_id', 'cook_time_in_min', 'prep_time_in_min', 'total_time_in_min',
-                  'title', 'cuisine', 'servings', 'ingredients', 'steps', 'nutrition_information']
+                  'title', 'cuisine', 'servings', 'ingredients', 'steps', 'nutrition_information', 'images']
+
