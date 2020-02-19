@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 import uuid
 
-from recipe_management.recipe_management.storage_backends import PrivateMediaStorage
-
 
 class User(models.Model):
 
@@ -48,6 +46,5 @@ class OrderedList(models.Model):
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     urls = models.CharField(max_length=256)
-    images = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='images')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    file = models.FileField(storage=PrivateMediaStorage())
+    recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='images')
+

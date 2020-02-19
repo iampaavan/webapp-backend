@@ -31,7 +31,6 @@ class NutritionaInfoSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Image
         fields = ['id', 'urls']
@@ -42,11 +41,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     steps = OrderlistSerializer(many=True)
     images = ImageSerializer(many=True)
     nutrition_information = NutritionaInfoSerializer()
+    images = ImageSerializer(many=True)
 
     class Meta:
         model = Recipes
-        fields = ['images', 'id', 'created_ts', 'updated_ts', 'author_id', 'cook_time_in_min', 'prep_time_in_min', 'total_time_in_min',
-                  'title', 'cuisine', 'servings', 'ingredients', 'steps', 'nutrition_information']
-
-
-
+        fields = ['id', 'created_ts', 'updated_ts', 'author_id', 'cook_time_in_min', 'prep_time_in_min',
+                  'total_time_in_min', 'title', 'cuisine', 'servings', 'ingredients', 'steps',
+                  'nutrition_information', 'images']

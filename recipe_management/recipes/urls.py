@@ -9,5 +9,6 @@ urlpatterns = [
     path('recipe/<id>', views.recipe_crud),
     path('get/random/recipe', views.get_random_recipe),
     path('health', views.health_check),
-    path('get/image', views.upload_image)
+    path('recipe/<id>/image', views.upload_image)
+
 ]
