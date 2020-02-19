@@ -8,7 +8,13 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.http import HttpResponse, JsonResponse
 from .validators import multipleValidator, minMaxvalidators, minValidator, uniqueValidator
-from .models import User, Recipes, OrderedList, NutritionalInformation
+from .models import User, Recipes, OrderedList, NutritionalInformation, Image
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
 
 email = ""
 
@@ -376,3 +382,27 @@ def check_params(req_params, req_body):
         elif not req_body[item]:
             missing_keys.append(item)
     return missing_keys
+
+
+def upload_image(request):
+
+    if request.method == 'POST':
+        auth = request.headers.get('Authorization')
+
+        if auth:
+            auth_status = checkauth(auth)
+        else:
+            return JsonResponse("Please provide login credentials", status=403, safe=False)
+
+        if auth_status == 'success':
+            image_file = request.FILES['image_file']
+            image_type = request.POST['image_type']
+            if settings.USE_S3:
+                if image_type == 'private':
+                    upload = Image(file=image_file)
+                upload.save()
+                image_url = upload.file.url
+            return HttpResponse("Image Uploaded Successfully", status=201, content_type='application/json')
+
+        else:
+            return HttpResponse('Image failed to upload', status=404, content_type='application/json')

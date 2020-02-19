@@ -11,7 +11,7 @@
   shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-secrets.yaml"
 
 - name: create config map
-  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-configMap.yaml"
+  shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-secrets_db.yaml"
 
 - name: create config map
   shell: "kubectl apply -f ~/csye7374/webapp-backend/k8s/backend-k8s-job.yaml"
