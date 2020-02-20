@@ -191,26 +191,35 @@ def upload_image(request, id):
             auth = request.headers.get('Authorization')
             file = request.FILES['file']
             auth_status = checkauth(auth)
-            if auth_status == "success":
-                recipe_obj = Recipes.objects.get(pk=id)
-                try:
-                    file_name = file.name
-                    s3_bucket = "dev-hgadhiya-csye7374-image-upload"
-                    s3_client = boto3.client(
-                        's3',
-                        aws_access_key_id="AKIAUJWRCG77QYGIF35U",
-                        aws_secret_access_key="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")
-                    s3_client.upload_fileobj(file, s3_bucket, file_name)
-                    s3_url = f"https://{s3_bucket}.s3.amazonaws.com/{file_name}"
+            try:
+                if auth_status == "success":
+                    user = User.objects.get(email_address=email)
+                    recipe_obj = Recipes.objects.get(pk=id)
+                    if not (recipe_obj.author_id == user):
+                        return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
+                    else:
+                        file_name = file.name
+                        s3_bucket = "dev-hgadhiya-csye7374-image-upload"
+                        s3_client = boto3.client(
+                            's3',
+                            aws_access_key_id="",
+                            aws_secret_access_key="")
+                        s3_client.upload_fileobj(file, s3_bucket, file_name)
+                        s3_url = f"https://{s3_bucket}.s3.amazonaws.com/{file_name}"
 
-                    img_object = Image(urls=s3_url, recipe=recipe_obj)
-                    img_object.save()
-                    ser = ImageSerializer(img_object)
-                except Exception as e:
-                    print(e)
-                return JsonResponse(ser.data, status=200)
+                        img_object = Image(urls=s3_url, recipe=recipe_obj)
+                        img_object.save()
+                        ser = ImageSerializer(img_object)
+                    return JsonResponse(ser.data, status=200)
+            except Recipes.DoesNotExist:
+                return JsonResponse("No recipe Found", status=404, safe=False)
+            except ValidationError:
+                return JsonResponse("Recipe not Found", status=404, safe=False)
+            except Exception as e:
+                return JsonResponse("Permission denied", status=403, safe=False)
     except Exception as e:
         print(e)
+
 
 
 
