@@ -33,8 +33,36 @@ spec:
             port: liveness-port
           initialDelaySeconds: 80
           periodSeconds: 3
-        envFrom:
-        - configMapRef:
-           name: configmap
+        env:
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_HOST
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_USER
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_USER
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_PASS
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_PORT
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: django-backend-secret
+                key: DB_NAME
       imagePullSecrets:
       - name: dockercreds

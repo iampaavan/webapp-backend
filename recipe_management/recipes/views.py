@@ -1,14 +1,15 @@
 import json
+import boto3
 import random
 import bcrypt
 import base64
 from django.db import IntegrityError
-from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer
+from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer, ImageSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.http import HttpResponse, JsonResponse
 from .validators import multipleValidator, minMaxvalidators, minValidator, uniqueValidator
-from .models import User, Recipes, OrderedList, NutritionalInformation
+from .models import User, Recipes, OrderedList, NutritionalInformation, Image
 
 email = ""
 
@@ -123,6 +124,7 @@ def get_user(request):
 
 
 def create_recipe(request):
+
     if request.method == "POST":
         auth = request.headers.get('Authorization')
         if auth:
@@ -183,6 +185,43 @@ def create_recipe(request):
         return JsonResponse("Invalid request method", status=400, safe=False)
 
 
+def upload_image(request, id):
+    region = 'us-east-1'
+    try:
+        if request.method == "POST":
+            auth = request.headers.get('Authorization')
+            file = request.FILES['file']
+            auth_status = checkauth(auth)
+            try:
+                if auth_status == "success":
+                    user = User.objects.get(email_address=email)
+                    recipe_obj = Recipes.objects.get(pk=id)
+                    if not (recipe_obj.author_id == user):
+                        return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
+                    else:
+                        file_name = file.name
+                        s3_bucket = "dev-csye7374-django-backend-recipe-management"
+                        s3_client = boto3.client(
+                            's3',
+                            aws_access_key_id="AKIAY2TPSKG7XT2RWQOM",
+                            aws_secret_access_key="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")
+                        s3_client.upload_fileobj(file, s3_bucket, file_name)
+                        s3_url = f"https://s3-{region}.amazonaws.com/{s3_bucket}/{file_name}"
+
+                        img_object = Image(urls=s3_url, recipe=recipe_obj)
+                        img_object.save()
+                        ser = ImageSerializer(img_object)
+                    return JsonResponse(ser.data, status=200)
+            except Recipes.DoesNotExist:
+                return JsonResponse("No recipe Found", status=404, safe=False)
+            except ValidationError:
+                return JsonResponse("Recipe not Found", status=404, safe=False)
+            except Exception as e:
+                return JsonResponse("Permission denied", status=403, safe=False)
+    except Exception as e:
+        print(e)
+
+
 def get_newest_recipe(request):
     if request.method == 'GET':
         try:
@@ -226,6 +265,30 @@ def get_new_recipe_by_id(request, id):
         return JsonResponse("Recipe not Found", status=404, safe=False)
     except Recipes.DoesNotExist:
         return JsonResponse("Recipe not Found", status=404, safe=False)
+
+
+def get_image_by_id(request, recipe_id, image_id):
+    if request.method == "GET":
+        try:
+            recipe_obj = Recipes.objects.get(pk=recipe_id)
+            image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
+            serializer = ImageSerializer(image_obj)
+            return JsonResponse(serializer.data, status=200)
+
+        except ValidationError:
+            return JsonResponse("Image not Found", status=404, safe=False)
+
+        except Recipes.DoesNotExist:
+            return JsonResponse("Image not Found", status=404, safe=False)
+
+        except Exception as e:
+            return HttpResponse(e, status=404)
+
+    elif request.method == 'POST':
+        return HttpResponse(f"Invalid request type: {request.method}", status=403)
+
+    elif request.method == 'PUT':
+        return HttpResponse(f"Invalid request type: {request.method}", status=403)
 
 
 def recipe_crud(request, id):
