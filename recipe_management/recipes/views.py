@@ -290,6 +290,41 @@ def get_image_by_id(request, recipe_id, image_id):
     elif request.method == 'PUT':
         return HttpResponse(f"Invalid request type: {request.method}", status=403)
 
+    elif request.method == 'DELETE':
+        return delete_image_by_id(request, recipe_id, image_id)
+
+
+def delete_image_by_id(request, recipe_id, image_id):
+    auth = request.headers.get('Authorization')
+    if request.method == "DELETE":
+        if auth:
+            auth_status = checkauth(auth)
+
+        else:
+            return JsonResponse("please provide login credentials", status=403, safe=False)
+
+        if auth_status == 'success':
+            try:
+                user_obj = User.objects.get(email_address=email)
+                recipe_obj = Recipes.objects.get(pk=recipe_id, author_id=user_obj)
+                Image.objects.get(pk=image_id, recipe=recipe_obj).delete()
+                return JsonResponse("Image Deleted Successfully", status=204, safe=False)
+            except ValidationError:
+                return JsonResponse("Unknown error. Nothing to delete", status=404, safe=False)
+            except Image.DoesNotExist:
+                return JsonResponse("No Image found to delete", status=404, safe=False)
+
+        elif auth_status == "wrong_pwd":
+            return JsonResponse("Wrong Password", status=403, safe=False)
+
+        elif auth_status == "no_user":
+            return JsonResponse("User Not Found", status=404, safe=False)
+
+
+def delete_image_from_s3():
+    s3 = boto3.resource('s3')
+    s3.Object('dev-csye7374-django-backend-recipe-management', 'your-key').delete()
+
 
 def recipe_crud(request, id):
     auth = request.headers.get('Authorization')
