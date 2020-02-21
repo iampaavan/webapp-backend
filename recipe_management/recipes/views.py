@@ -1,16 +1,22 @@
 import json
+import boto3
 import random
 import bcrypt
 import base64
 from django.db import IntegrityError
-from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer
+from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer, ImageSerializer
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email, RegexValidator
 from django.http import HttpResponse, JsonResponse
 from .validators import multipleValidator, minMaxvalidators, minValidator, uniqueValidator
-from .models import User, Recipes, OrderedList, NutritionalInformation
+from .models import User, Recipes, OrderedList, NutritionalInformation, Image
+from boto.s3.connection import S3Connection, Bucket, Key
+import os
 
 email = ""
+BUCKET = os.environ.get("BUCKET_NAME")
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
 
 
 def user(request):
@@ -123,6 +129,7 @@ def get_user(request):
 
 
 def create_recipe(request):
+
     if request.method == "POST":
         auth = request.headers.get('Authorization')
         if auth:
@@ -177,10 +184,53 @@ def create_recipe(request):
 
         elif auth_status == "wrong_pwd":
             return JsonResponse("Wrong Password", status=403, safe=False)
+
         elif auth_status == "no_user":
             return JsonResponse("User Not Found", status=404, safe=False)
+
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
+
+
+def upload_image(request, id):
+    region = 'us-east-1'
+    try:
+        if request.method == "POST":
+            auth = request.headers.get('Authorization')
+            file = request.FILES['file']
+            auth_status = checkauth(auth)
+            try:
+                if auth_status == "success":
+                    user = User.objects.get(email_address=email)
+                    recipe_obj = Recipes.objects.get(pk=id)
+                    if not (recipe_obj.author_id == user):
+                        return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
+                    else:
+                        file_name = file.name
+                        s3_bucket = BUCKET
+                        s3_client = boto3.client(
+                            's3',
+                            aws_access_key_id=AWS_ACCESS_KEY,
+                            aws_secret_access_key=AWS_SECRET_KEY)
+                        s3_client.upload_fileobj(file, s3_bucket, file_name)
+                        s3_url = f"https://s3-{region}.amazonaws.com/{s3_bucket}/{file_name}"
+
+                        img_object = Image(urls=s3_url, recipe=recipe_obj)
+                        img_object.save()
+                        ser = ImageSerializer(img_object)
+                    return JsonResponse(ser.data, status=200)
+
+            except Recipes.DoesNotExist:
+                return JsonResponse("No recipe Found", status=404, safe=False)
+
+            except ValidationError:
+                return JsonResponse("Recipe not Found", status=404, safe=False)
+
+            except Exception as e:
+                return JsonResponse("Permission denied", status=403, safe=False)
+
+    except Exception as e:
+        print(e)
 
 
 def get_newest_recipe(request):
@@ -226,6 +276,86 @@ def get_new_recipe_by_id(request, id):
         return JsonResponse("Recipe not Found", status=404, safe=False)
     except Recipes.DoesNotExist:
         return JsonResponse("Recipe not Found", status=404, safe=False)
+
+
+def get_image_by_id(request, recipe_id, image_id):
+    if request.method == "GET":
+        try:
+            recipe_obj = Recipes.objects.get(pk=recipe_id)
+            image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
+            serializer = ImageSerializer(image_obj)
+            return JsonResponse(serializer.data, status=200)
+
+        except ValidationError:
+            return JsonResponse("Image not Found", status=404, safe=False)
+
+        except Recipes.DoesNotExist:
+            return JsonResponse("Image not Found", status=404, safe=False)
+
+        except Exception as e:
+            return HttpResponse("Image not found. Nothing to delete.", status=404)
+
+    elif request.method == 'POST':
+        return HttpResponse(f"Invalid request type: {request.method}", status=403)
+
+    elif request.method == 'PUT':
+        return HttpResponse(f"Invalid request type: {request.method}", status=403)
+
+    elif request.method == 'DELETE':
+        return delete_image_by_id(request, recipe_id, image_id)
+
+
+def delete_image_by_id(request, recipe_id, image_id):
+    auth = request.headers.get('Authorization')
+
+    if request.method == "DELETE":
+
+        if auth:
+            auth_status = checkauth(auth)
+
+        else:
+            return JsonResponse("please provide login credentials", status=403, safe=False)
+
+        if auth_status == 'success':
+            try:
+                user_obj = User.objects.get(email_address=email)
+                recipe_obj = Recipes.objects.get(pk=recipe_id, author_id=user_obj)
+                image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
+                Image.objects.get(pk=image_id, recipe=recipe_obj).delete()
+                url = image_obj.urls
+                file_name = url.split('/')[-1]
+                delete_image_from_s3(file_name)
+                return JsonResponse("Image Deleted Successfully", status=204, safe=False)
+
+            except ValidationError:
+                return JsonResponse("Unknown error. Nothing to delete", status=404, safe=False)
+
+            except Image.DoesNotExist:
+                return JsonResponse("No Image found to delete", status=404, safe=False)
+
+            except Exception:
+                return JsonResponse("You are not authorized to delete this image", status=403, safe=False)
+
+        elif auth_status == "wrong_pwd":
+            return JsonResponse("Wrong Password", status=403, safe=False)
+
+        elif auth_status == "no_user":
+            return JsonResponse("User Not Found", status=404, safe=False)
+
+        else:
+            return JsonResponse("Unauthorized", status=403, safe=False)
+
+
+def delete_image_from_s3(file_name):
+
+    try:
+        conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
+        bucket = Bucket(conn, BUCKET)
+        k = Key(bucket=bucket, name=file_name)
+        k.delete()
+
+    except Exception as e:
+        print(e)
 
 
 def recipe_crud(request, id):

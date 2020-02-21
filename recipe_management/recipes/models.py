@@ -42,3 +42,8 @@ class OrderedList(models.Model):
     items = models.CharField(max_length=256)
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='steps')
 
+
+class Image(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    urls = models.CharField(max_length=256)
+    recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='images')
