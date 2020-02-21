@@ -293,7 +293,7 @@ def get_image_by_id(request, recipe_id, image_id):
             return JsonResponse("Image not Found", status=404, safe=False)
 
         except Exception as e:
-            return HttpResponse(e, status=404)
+            return HttpResponse("Image not found. Nothing to delete.", status=404)
 
     elif request.method == 'POST':
         return HttpResponse(f"Invalid request type: {request.method}", status=403)
