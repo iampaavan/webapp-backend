@@ -10,6 +10,7 @@ from django.core.validators import validate_email, RegexValidator
 from django.http import HttpResponse, JsonResponse
 from .validators import multipleValidator, minMaxvalidators, minValidator, uniqueValidator
 from .models import User, Recipes, OrderedList, NutritionalInformation, Image
+from boto.s3.connection import S3Connection, Bucket, Key
 
 email = ""
 
@@ -296,7 +297,9 @@ def get_image_by_id(request, recipe_id, image_id):
 
 def delete_image_by_id(request, recipe_id, image_id):
     auth = request.headers.get('Authorization')
+
     if request.method == "DELETE":
+
         if auth:
             auth_status = checkauth(auth)
 
@@ -307,7 +310,11 @@ def delete_image_by_id(request, recipe_id, image_id):
             try:
                 user_obj = User.objects.get(email_address=email)
                 recipe_obj = Recipes.objects.get(pk=recipe_id, author_id=user_obj)
+                image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
                 Image.objects.get(pk=image_id, recipe=recipe_obj).delete()
+                url = image_obj.urls
+                file_name = url.split('/')[-1]
+                delete_image_from_s3(file_name)
                 return JsonResponse("Image Deleted Successfully", status=204, safe=False)
             except ValidationError:
                 return JsonResponse("Unknown error. Nothing to delete", status=404, safe=False)
@@ -320,10 +327,20 @@ def delete_image_by_id(request, recipe_id, image_id):
         elif auth_status == "no_user":
             return JsonResponse("User Not Found", status=404, safe=False)
 
+        else:
+            return JsonResponse("Unauthorized", status=403, safe=False)
 
-def delete_image_from_s3():
-    s3 = boto3.resource('s3')
-    s3.Object('dev-csye7374-django-backend-recipe-management', 'your-key').delete()
+
+def delete_image_from_s3(file_name):
+
+    try:
+        conn = S3Connection('AKIAY2TPSKG7XT2RWQOM', 'Wc11TI2Sa+2k0hIdG5hARJ2X4gCuLNdv6IuCBEpb')
+        bucket = Bucket(conn, 'dev-csye7374-django-backend-recipe-management')
+        k = Key(bucket=bucket, name=file_name)
+        k.delete()
+
+    except Exception as e:
+        print(e)
 
 
 def recipe_crud(request, id):
