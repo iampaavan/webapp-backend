@@ -11,8 +11,12 @@ from django.http import HttpResponse, JsonResponse
 from .validators import multipleValidator, minMaxvalidators, minValidator, uniqueValidator
 from .models import User, Recipes, OrderedList, NutritionalInformation, Image
 from boto.s3.connection import S3Connection, Bucket, Key
+import os
 
 email = ""
+BUCKET = os.environ.get("BUCKET_NAME")
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
 
 
 def user(request):
@@ -180,8 +184,10 @@ def create_recipe(request):
 
         elif auth_status == "wrong_pwd":
             return JsonResponse("Wrong Password", status=403, safe=False)
+
         elif auth_status == "no_user":
             return JsonResponse("User Not Found", status=404, safe=False)
+
     else:
         return JsonResponse("Invalid request method", status=400, safe=False)
 
@@ -201,11 +207,11 @@ def upload_image(request, id):
                         return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
                     else:
                         file_name = file.name
-                        s3_bucket = "dev-csye7374-django-backend-recipe-management"
+                        s3_bucket = BUCKET
                         s3_client = boto3.client(
                             's3',
-                            aws_access_key_id="AKIAY2TPSKG7XT2RWQOM",
-                            aws_secret_access_key="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")
+                            aws_access_key_id=AWS_ACCESS_KEY,
+                            aws_secret_access_key=AWS_SECRET_KEY)
                         s3_client.upload_fileobj(file, s3_bucket, file_name)
                         s3_url = f"https://s3-{region}.amazonaws.com/{s3_bucket}/{file_name}"
 
@@ -213,12 +219,16 @@ def upload_image(request, id):
                         img_object.save()
                         ser = ImageSerializer(img_object)
                     return JsonResponse(ser.data, status=200)
+
             except Recipes.DoesNotExist:
                 return JsonResponse("No recipe Found", status=404, safe=False)
+
             except ValidationError:
                 return JsonResponse("Recipe not Found", status=404, safe=False)
+
             except Exception as e:
                 return JsonResponse("Permission denied", status=403, safe=False)
+
     except Exception as e:
         print(e)
 
@@ -339,8 +349,8 @@ def delete_image_by_id(request, recipe_id, image_id):
 def delete_image_from_s3(file_name):
 
     try:
-        conn = S3Connection('AKIAY2TPSKG7XT2RWQOM', 'Wc11TI2Sa+2k0hIdG5hARJ2X4gCuLNdv6IuCBEpb')
-        bucket = Bucket(conn, 'dev-csye7374-django-backend-recipe-management')
+        conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
+        bucket = Bucket(conn, BUCKET)
         k = Key(bucket=bucket, name=file_name)
         k.delete()
 
