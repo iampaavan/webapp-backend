@@ -316,10 +316,15 @@ def delete_image_by_id(request, recipe_id, image_id):
                 file_name = url.split('/')[-1]
                 delete_image_from_s3(file_name)
                 return JsonResponse("Image Deleted Successfully", status=204, safe=False)
+
             except ValidationError:
                 return JsonResponse("Unknown error. Nothing to delete", status=404, safe=False)
+
             except Image.DoesNotExist:
                 return JsonResponse("No Image found to delete", status=404, safe=False)
+
+            except Exception:
+                return JsonResponse("You are not authorized to delete this image", status=403, safe=False)
 
         elif auth_status == "wrong_pwd":
             return JsonResponse("Wrong Password", status=403, safe=False)
