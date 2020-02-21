@@ -4,4 +4,6 @@ gunicorn==19.7.1
 psycopg2-binary>=2.8
 bcrypt>=1.0
 djangorestframework>=3.10
+boto3==1.11.7
+botocore==1.14.7
 
