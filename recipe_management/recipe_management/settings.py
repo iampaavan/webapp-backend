@@ -85,34 +85,33 @@ WSGI_APPLICATION = 'recipe_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         "ENGINE": "django.db.backends.postgresql",
-#         'NAME': os.environ.get("DB_NAME"),
-#         'USER': os.environ.get("DB_USER"),
-#         'PASSWORD': os.environ.get("DB_PASS"),
-#         'HOST': os.environ.get("DB_HOST"),
-#         'PORT': os.environ.get("DB_PORT"),
-#     }
-# }
-
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        'NAME': "recipe",
-        'USER': "postgres",
-        'PASSWORD': "root",
-        'HOST': "127.0.0.1",
-        'PORT': "5432",
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
+        'PASSWORD': os.environ.get("DB_PASS"),
+        'HOST': os.environ.get("DB_HOST"),
+        'PORT': os.environ.get("DB_PORT"),
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         "ENGINE": "django.db.backends.postgresql",
+#         'NAME': "recipe",
+#         'USER': "postgres",
+#         'PASSWORD': "root",
+#         'HOST': "127.0.0.1",
+#         'PORT': "5432",
+#     }
+# }
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
-            "PASSWORD": "cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO",
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             'PARSER_CLASS': 'redis.connection.HiredisParser',
         },
@@ -120,7 +119,7 @@ CACHES = {
 }
 
 # Redis Settings
-REDIS_CONN_POOL_1 = redis.ConnectionPool(host='localhost', port=6379, db=0, password='cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO')
+REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
 # Cache time to live is 10 minutes.

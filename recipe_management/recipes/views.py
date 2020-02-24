@@ -21,13 +21,10 @@ from django.views.decorators.cache import never_cache
 
 email = ""
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
-# BUCKET = os.environ.get("BUCKET_NAME")
-# AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
-# AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
+BUCKET = os.environ.get("BUCKET_NAME")
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
 
-BUCKET = 'dev-csye7374-django-backend-recipe-management'
-AWS_ACCESS_KEY = 'AKIAY2TPSKG7XT2RWQOM'
-AWS_SECRET_KEY = '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'
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 conn = False
