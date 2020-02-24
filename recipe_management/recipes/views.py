@@ -270,13 +270,14 @@ def get_newest_recipe(request):
             if cache_string in cache:
                 output = cache.get(str(recipe_obj.id))
                 logging.debug(output)
-                return HttpResponse(output, status=200, content_type="application\json")
+                return JsonResponse(output, status=200, safe=False, json_dumps_params={'indent': 4})
 
             else:
                 recipe_obj = Recipes.objects.latest('updated_ts')
                 serialize = RecipeSerializer(recipe_obj)
                 logging.debug(serialize.data)
-                return JsonResponse(serialize.data, status=200)
+                cache.set(str(recipe_obj.id), str(serialize.data), timeout=CACHE_TTL)
+                return JsonResponse(serialize.data, status=200, safe=False, json_dumps_params={'indent': 4})
 
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
@@ -306,13 +307,13 @@ def get_random_recipe(request):
             if cache_string in cache:
                 output = cache.get(str(random_item.id))
                 logging.debug(output)
-                return HttpResponse(output, status=200, content_type="application\json")
+                return JsonResponse(output, status=200, safe=False, json_dumps_params={'indent': 4})
 
             else:
                 recipe_obj = Recipes.objects.all()
                 random_item = random.choice(recipe_obj)
                 serialize = RecipeSerializer(random_item)
-                return JsonResponse(serialize.data, status=200)
+                return JsonResponse(serialize.data, status=200, safe=False, json_dumps_params={'indent': 4})
 
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
@@ -328,6 +329,7 @@ def health_check(request):
         return HttpResponse("Abort", status=400, content_type='application/json')
 
 
+@never_cache
 def get_new_recipe_by_id(request, id):
     try:
         recipe_obj = Recipes.objects.get(pk=id)
@@ -339,6 +341,7 @@ def get_new_recipe_by_id(request, id):
         return JsonResponse("Recipe not Found", status=404, safe=False)
 
 
+@never_cache
 def get_image_by_id(request, recipe_id, image_id):
     if request.method == "GET":
         try:
@@ -386,6 +389,9 @@ def delete_image_by_id(request, recipe_id, image_id):
                 url = image_obj.urls
                 file_name = url.split('/')[-1]
                 delete_image_from_s3(file_name)
+                cache_string = str(recipe_obj.id)
+                if cache_string in cache:
+                    cache.delete(cache_string)
                 return JsonResponse("Image Deleted Successfully", status=204, safe=False)
 
             except ValidationError:
