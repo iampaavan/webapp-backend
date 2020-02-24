@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import redis
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -42,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'recipe_management',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +56,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'recipe_management.urls'
@@ -79,27 +85,46 @@ WSGI_APPLICATION = 'recipe_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        "ENGINE": "django.db.backends.postgresql",
-        'NAME': os.environ.get("DB_NAME"),
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASS"),
-        'HOST': os.environ.get("DB_HOST"),
-        'PORT': os.environ.get("DB_PORT"),
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         "ENGINE": "django.db.backends.postgresql",
-#         'NAME': "recipe",
-#         'USER': "postgres",
-#         'PASSWORD': "root",
-#         'HOST': "127.0.0.1",
-#         'PORT': "5432",
+#         'NAME': os.environ.get("DB_NAME"),
+#         'USER': os.environ.get("DB_USER"),
+#         'PASSWORD': os.environ.get("DB_PASS"),
+#         'HOST': os.environ.get("DB_HOST"),
+#         'PORT': os.environ.get("DB_PORT"),
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        "ENGINE": "django.db.backends.postgresql",
+        'NAME': "recipe",
+        'USER': "postgres",
+        'PASSWORD': "root",
+        'HOST': "127.0.0.1",
+        'PORT': "5432",
+    }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "PASSWORD": "cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+        },
+    }
+}
+
+# Redis Settings
+REDIS_CONN_POOL_1 = redis.ConnectionPool(host='localhost', port=6379, db=0, password='cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO')
+
+
+# Cache time to live is 10 minutes.
+CACHE_TTL = 60 * 10
 
 
 # Password validation
