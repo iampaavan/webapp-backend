@@ -436,11 +436,17 @@ def recipe_crud(request, id):
         if auth_status == 'success':
             try:
                 user_obj = User.objects.get(email_address=email)
+                recipe_obj = Recipes.objects.get(pk=id, author_id=user_obj.id)
                 Recipes.objects.get(pk=id, author_id=user_obj.id).delete()
+                cache_string = str(recipe_obj.id)
+                if cache_string in cache:
+                    cache.delete(cache_string)
                 return JsonResponse("Recipe Deleted Successfully", status=204, safe=False)
             except ValidationError:
                 return JsonResponse("No Validate Recipe found to delete", status=404, safe=False)
             except Recipes.DoesNotExist:
+                return JsonResponse("No recipe to delete.", status=404, safe=False)
+            except Exception:
                 return JsonResponse("You are not authorized to delete this.", status=401, safe=False)
 
         elif auth_status == "wrong_pwd":
@@ -491,6 +497,9 @@ def update_recipe(request, id, auth):
 
         try:
             recipe = Recipes.objects.get(pk=id)
+            cache_string = str(recipe.id)
+            if cache_string in cache:
+                cache.delete(cache_string)
             if not (recipe.author_id == user):
                 return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
             else:
@@ -521,6 +530,7 @@ def update_recipe(request, id, auth):
 
                 recipe.save()
                 serial = RecipeSerializer(recipe)
+                cache.set(str(recipe.id), str(serial.data), timeout=CACHE_TTL)
                 return JsonResponse(serial.data, status=200)
         except ValidationError:
             return JsonResponse("Recipe not Found", status=404, safe=False)
