@@ -320,10 +320,13 @@ def get_random_recipe(request):
 
 
 def health_check(request):
-    if request.method == 'GET':
-        return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
-    else:
-        return HttpResponse("Abort", status=400, content_type='application/json')
+    try:
+        if request.method == 'GET':
+            return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
+        else:
+            return HttpResponse("Abort", status=400, content_type='application/json')
+    except Exception as e:
+        return HttpResponse(e, status=200, content_type='application/json')
 
 
 @never_cache
