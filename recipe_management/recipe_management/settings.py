@@ -111,7 +111,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": [
-            '%s:%s' % (os.environ.get('BACKEND_REDIS_SERVICE_HOST'),
+            'redis://%s:%s' % (os.environ.get('BACKEND_REDIS_SERVICE_HOST'),
                        os.environ.get('BACKEND_REDIS_SERVICE_PORT'))
         ],
         "OPTIONS": {
