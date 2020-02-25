@@ -116,6 +116,7 @@ CACHES = {
         ],
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": os.environ.get('redisPass'),
             'PARSER_CLASS': 'redis.connection.HiredisParser',
         },
     }
