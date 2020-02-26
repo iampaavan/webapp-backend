@@ -16,7 +16,6 @@ import redis
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -81,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'recipe_management.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -112,7 +110,7 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": [
             'redis://%s:%s' % (os.environ.get('BACKEND_REDIS_SERVICE_HOST'),
-                       os.environ.get('redisPort'))
+                               os.environ.get('redisPort'))
         ],
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -123,8 +121,8 @@ CACHES = {
 }
 
 # Redis Settings
-REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERVICE_HOST"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
-
+REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERVICE_HOST"),
+                                         port=os.environ.get('BACKEND_REDIS_SERVICE_PORT'), db=0, password=os.environ.get("redisPass"))
 
 # CACHES = {
 #     "default": {
@@ -145,10 +143,8 @@ REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERV
 # REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
-
 # Cache time to live is 10 minutes.
 CACHE_TTL = 60 * 10
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -168,7 +164,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -181,7 +176,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
