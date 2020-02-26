@@ -128,7 +128,8 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": [
-            'redis://%s:26379' % (os.environ.get('redisHost'))
+            'redis://%s:%s' % (os.environ.get('redisHost'),
+                       os.environ.get('redisPort'))
         ],
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -139,7 +140,7 @@ CACHES = {
 }
 
 # Redis Settings
-REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=26379, db=0, password=os.environ.get("redisPass"))
+REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
 # Cache time to live is 10 minutes.
