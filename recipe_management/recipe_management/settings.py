@@ -107,31 +107,12 @@ DATABASES = {
 #     }
 # }
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": [
-#             'redis://%s:%s' % (os.environ.get('BACKEND_REDIS_SERVICE_HOST'),
-#                        os.environ.get('BACKEND_REDIS_SENTINEL_SERVICE_PORT'))
-#         ],
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#             "PASSWORD": os.environ.get('redisPass'),
-#             'PARSER_CLASS': 'redis.connection.HiredisParser',
-#         },
-#     }
-# }
-#
-# # Redis Settings
-# REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERVICE_HOST"), port=os.environ.get("BACKEND_REDIS_SERVICE_PORT"), db=0, password=os.environ.get("redisPass"))
-
-
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": [
-            'redis://%s:%s' % (os.environ.get('redisHost'),
-                       os.environ.get('redisPort'))
+            'redis://%s:%s' % (os.environ.get('BACKEND_REDIS_SERVICE_HOST'),
+                       os.environ.get('BACKEND_REDIS_SENTINEL_SERVICE_PORT'))
         ],
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -142,7 +123,26 @@ CACHES = {
 }
 
 # Redis Settings
-REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
+REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERVICE_HOST"), port=os.environ.get("BACKEND_REDIS_SERVICE_PORT"), db=0, password=os.environ.get("redisPass"))
+
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": [
+#             'redis://%s:%s' % (os.environ.get('redisHost'),
+#                        os.environ.get('redisPort'))
+#         ],
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "PASSWORD": os.environ.get('redisPass'),
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#         },
+#     }
+# }
+#
+# # Redis Settings
+# REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
 
