@@ -112,7 +112,7 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": [
             'redis://%s:%s' % (os.environ.get('BACKEND_REDIS_SERVICE_HOST'),
-                       os.environ.get('BACKEND_REDIS_SENTINEL_PORT'))
+                       os.environ.get('redisPort'))
         ],
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -123,7 +123,7 @@ CACHES = {
 }
 
 # Redis Settings
-REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERVICE_HOST"), port=os.environ.get("BACKEND_REDIS_SERVICE_PORT"), db=0, password=os.environ.get("redisPass"))
+REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("BACKEND_REDIS_SERVICE_HOST"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
 # CACHES = {
