@@ -18,6 +18,7 @@ import redis
 import os
 import logging
 from django.views.decorators.cache import never_cache
+import uuid
 
 email = ""
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -230,6 +231,7 @@ def upload_image(request, id):
                         return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
                     else:
                         file_name = file.name
+                        file_name = file_name + str(uuid.uuid4())
                         s3_bucket = BUCKET
                         s3_client = boto3.client(
                             's3',
@@ -333,22 +335,51 @@ def health_check(request):
 def get_new_recipe_by_id(request, id):
     try:
         recipe_obj = Recipes.objects.get(pk=id)
-        serlializer = RecipeSerializer(recipe_obj)
-        return JsonResponse(serlializer.data, status=200)
+        cache_string = str(recipe_obj.id)
+        if cache_string in cache:
+            output = cache.get(cache_string)
+            logging.debug(output)
+            return JsonResponse(output, status=200, safe=False, json_dumps_params={'indent': 4})
+        else:
+            recipe_obj = Recipes.objects.get(pk=id)
+            serlializer = RecipeSerializer(recipe_obj)
+            logging.debug(serlializer.data)
+            cache.set(str(recipe_obj.id), str(serlializer.data), timeout=CACHE_TTL)
+            return JsonResponse(serlializer.data, status=200)
+
     except ValidationError:
         return JsonResponse("Recipe not Found", status=404, safe=False)
+
     except Recipes.DoesNotExist:
         return JsonResponse("Recipe not Found", status=404, safe=False)
+
+    except ValueError:
+        return JsonResponse('Recipe not found', status=404, safe=False)
+
+    except Exception as e:
+        print(e)
 
 
 @never_cache
 def get_image_by_id(request, recipe_id, image_id):
+
     if request.method == "GET":
+
         try:
             recipe_obj = Recipes.objects.get(pk=recipe_id)
             image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
-            serializer = ImageSerializer(image_obj)
-            return JsonResponse(serializer.data, status=200)
+            cache_string = str(image_obj.id)
+
+            if cache_string in cache:
+                output = cache.get(cache_string)
+                return JsonResponse(output, status=200, safe=False, json_dumps_params={'indent': 4})
+
+            else:
+                recipe_obj = Recipes.objects.get(pk=recipe_id)
+                image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
+                serializer = ImageSerializer(image_obj)
+                cache.set(str(image_obj.id), str(serializer.data), timeout=CACHE_TTL)
+                return JsonResponse(serializer.data, status=200)
 
         except ValidationError:
             return JsonResponse("Image not Found", status=404, safe=False)
@@ -356,8 +387,11 @@ def get_image_by_id(request, recipe_id, image_id):
         except Recipes.DoesNotExist:
             return JsonResponse("Image not Found", status=404, safe=False)
 
-        except Exception as e:
-            return HttpResponse("Image not found. Nothing to delete.", status=404)
+        except Image.DoesNotExist:
+            return JsonResponse("Image not Found. Cannot get the requested image.", status=404, safe=False)
+
+        except Exception:
+            return JsonResponse("Unknown  Error.", status=404, safe=False)
 
     elif request.method == 'POST':
         return HttpResponse(f"Invalid request type: {request.method}", status=403)
