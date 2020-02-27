@@ -17,6 +17,7 @@ from django.core.cache import cache
 import redis
 import os
 import logging
+import redis
 from django.views.decorators.cache import never_cache
 
 email = ""
@@ -290,6 +291,20 @@ def get_newest_recipe(request):
 
     else:
         return JsonResponse("Bad Request", status=400, safe=False)
+
+def redis_health_check(request):
+    if request.method == 'GET':
+        try:
+            host = os.environ.get("redisHost")
+            port = os.environ.get("redisPort")
+            password = os.environ.get("redisPass")
+            conn = redis.StrictRedis(host=host, port=port, password=password)
+            if conn.ping():
+                return HttpResponse("Redis Connected", status=200, content_type='application/json')
+            else:
+                return HttpResponse("Redis Connection failed", status=400, content_type='application/json')
+        except Exception as e:
+            return HttpResponse(e, status=400, content_type='application/json')
 
 
 @never_cache
