@@ -14,9 +14,9 @@ from boto.s3.connection import S3Connection, Bucket, Key
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache import cache
-import redis
 import os
 import logging
+import redis
 from django.views.decorators.cache import never_cache
 import uuid
 
@@ -297,6 +297,21 @@ def get_newest_recipe(request):
         return JsonResponse("Bad Request", status=400, safe=False)
 
 
+def redis_health_check(request):
+    if request.method == 'GET':
+        try:
+            host = os.environ.get("redisHost")
+            port = os.environ.get("redisPort")
+            password = os.environ.get("redisPass")
+            conn = redis.StrictRedis(host=host, port=port, password=password)
+            if conn.ping():
+                return HttpResponse("Redis Connected", status=200, content_type='application/json')
+            else:
+                return HttpResponse("Redis Connection failed", status=400, content_type='application/json')
+        except Exception as e:
+            return HttpResponse(e, status=400, content_type='application/json')
+
+
 @never_cache
 def get_random_recipe(request):
     if request.method == 'GET':
@@ -325,10 +340,13 @@ def get_random_recipe(request):
 
 
 def health_check(request):
-    if request.method == 'GET':
-        return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
-    else:
-        return HttpResponse("Abort", status=400, content_type='application/json')
+    try:
+        if request.method == 'GET':
+            return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
+        else:
+            return HttpResponse("Abort", status=400, content_type='application/json')
+    except Exception as e:
+        return HttpResponse(e, status=200, content_type='application/json')
 
 
 @never_cache

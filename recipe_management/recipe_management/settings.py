@@ -16,7 +16,6 @@ import redis
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -25,8 +24,8 @@ SECRET_KEY = 'l@vdiy_jk#4so!u7c)kv@6%&uo1ix4*&m&gci!cizp7ah^-+%e'
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = int(os.environ.get("DEBUG", default=0))
+DEBUG = True
+# DEBUG = int(os.environ.get("DEBUG", default=0))
 
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
@@ -81,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'recipe_management.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -122,10 +120,46 @@ CACHES = {
 # Redis Settings
 REDIS_CONN_POOL_1 = redis.ConnectionPool(host='localhost', port=6379, db=0, password='cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO')
 
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": [
+#             'redis://%s:%s' % (os.environ.get('redisHost'),
+#                                os.environ.get('BACKEND_REDIS_SERVICE_PORT'))
+#         ],
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "PASSWORD": os.environ.get('redisPass'),
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#         },
+#     }
+# }
+#
+# # Redis Settings
+# REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"),
+#                                          port=os.environ.get('BACKEND_REDIS_SERVICE_PORT'), db=0, password=os.environ.get("redisPass"))
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": [
+#             'redis://%s:%s' % (os.environ.get('redisHost'),
+#                        os.environ.get('redisPort'))
+#         ],
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "PASSWORD": os.environ.get('redisPass'),
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#         },
+#     }
+# }
+#
+# # Redis Settings
+# REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
+#
 
 # Cache time to live is 10 minutes.
 CACHE_TTL = 60 * 10
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -145,7 +179,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -158,7 +191,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
