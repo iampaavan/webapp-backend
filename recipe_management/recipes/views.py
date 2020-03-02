@@ -20,6 +20,7 @@ import redis
 from django.views.decorators.cache import never_cache
 import uuid
 
+
 email = ""
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 # BUCKET = os.environ.get("BUCKET_NAME")
