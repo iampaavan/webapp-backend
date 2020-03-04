@@ -20,7 +20,11 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache import cache
 from django.views.decorators.cache import never_cache
 from . import metrics
+from prometheus_client import Summary
 
+
+# Create a metric to track time spent and requests made.
+REQUEST_TIME = Summary("request_processing_seconds", "Time spent processing request")
 
 email = ""
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -319,6 +323,7 @@ def redis_health_check(request):
             return HttpResponse(e, status=400, content_type='application/json')
 
 
+@REQUEST_TIME.time()
 @never_cache
 def get_random_recipe(request):
     metrics.random_recipe.inc()
@@ -349,6 +354,8 @@ def get_random_recipe(request):
     else:
         return JsonResponse("Bad Request", status=400, safe=False)
 
+
+@REQUEST_TIME.time()
 @never_cache
 def health_check(request):
     metrics.health_check.inc()

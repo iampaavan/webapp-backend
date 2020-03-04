@@ -1,5 +1,6 @@
 from prometheus_client import Counter
 
+
 user_created = Counter('user_created', "/v1/user --> create user")
 user_updated = Counter('user_updated', "/v1/user/self --> update user")
 get_user = Counter('get_user', "/v1/user/self --> get user details")
