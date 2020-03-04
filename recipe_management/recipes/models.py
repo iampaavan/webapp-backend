@@ -15,7 +15,7 @@ class User(ExportModelOperationsMixin('user'), models.Model):
     account_updated = models.DateTimeField(auto_now=True)
 
 
-class NutritionalInformation(ExportModelOperationsMixin('nutritionalinformation'), models.Model):
+class NutritionalInformation(ExportModelOperationsMixin('nutrition_info'), models.Model):
     calories = models.IntegerField()
     cholesterol_in_mg = models.DecimalField(max_digits=5, decimal_places=2)
     sodium_in_mg = models.IntegerField()
@@ -23,7 +23,7 @@ class NutritionalInformation(ExportModelOperationsMixin('nutritionalinformation'
     protein_in_grams = models.DecimalField(max_digits=5, decimal_places=2)
 
 
-class Recipes(ExportModelOperationsMixin('recipes'), models.Model):
+class Recipes(ExportModelOperationsMixin('recipe'), models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_ts = models.DateTimeField(auto_now_add=True, editable=False)
     updated_ts = models.DateTimeField(auto_now=True, editable=False)
@@ -38,13 +38,14 @@ class Recipes(ExportModelOperationsMixin('recipes'), models.Model):
     nutrition_information = models.OneToOneField(NutritionalInformation, on_delete=models.CASCADE, null=True)
 
 
-class OrderedList(ExportModelOperationsMixin('orderedlist'), models.Model):
+class OrderedList(ExportModelOperationsMixin('order_list'), models.Model):
+
     position = models.IntegerField()
     items = models.CharField(max_length=256)
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='steps')
 
 
-class Image(ExportModelOperationsMixin('image'), models.Model):
+class Image(ExportModelOperationsMixin('images'), models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     urls = models.CharField(max_length=256)
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='images')

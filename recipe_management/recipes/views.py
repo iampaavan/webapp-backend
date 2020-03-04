@@ -3,6 +3,10 @@ import boto3
 import random
 import bcrypt
 import base64
+import os
+import logging
+import redis
+import uuid
 from django.db import IntegrityError
 from .serializers import UserSerializer, RecipeSerializer, GetUserSerializer, ImageSerializer
 from django.core.exceptions import ValidationError
@@ -14,11 +18,8 @@ from boto.s3.connection import S3Connection, Bucket, Key
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache import cache
-import os
-import logging
-import redis
 from django.views.decorators.cache import never_cache
-import uuid
+from . import metrics
 
 
 email = ""
@@ -46,6 +47,7 @@ except Exception as connection_exception:
 
 def user(request):
     if request.method == 'POST':
+        metrics.user_created.inc()
         request_body = json.loads(request.body)
         if not request_body:
             return JsonResponse("No body Provided", status=204, safe=False)
@@ -83,6 +85,7 @@ def user(request):
 
 def update_user(request):
     if request.method == 'PUT':
+        metrics.user_updated.inc()
         auth = request.headers.get('Authorization')
         if auth:
             auth_status = checkauth(auth)
@@ -136,6 +139,7 @@ def update_user(request):
 
 
 def get_user(request):
+    metrics.get_user.inc()
     auth = request.headers.get('Authorization')
     if auth:
         auth_status = checkauth(auth)
@@ -156,6 +160,7 @@ def get_user(request):
 
 def create_recipe(request):
     if request.method == "POST":
+        metrics.recipe_created.inc()
         auth = request.headers.get('Authorization')
         if auth:
             auth_status = checkauth(auth)
@@ -221,6 +226,7 @@ def upload_image(request, id):
     region = 'us-east-1'
     try:
         if request.method == "POST":
+            metrics.image_uploaded.inc()
             auth = request.headers.get('Authorization')
             file = request.FILES['file']
             auth_status = checkauth(auth)
@@ -263,9 +269,8 @@ def upload_image(request, id):
 
 @never_cache
 def get_newest_recipe(request):
-
     if request.method == 'GET':
-
+        metrics.newest_recipe.inc()
         try:
             recipe_obj = Recipes.objects.latest('updated_ts')
             cache_string = str(recipe_obj.id)
@@ -300,6 +305,7 @@ def get_newest_recipe(request):
 
 def redis_health_check(request):
     if request.method == 'GET':
+        metrics.redis_health.inc()
         try:
             host = os.environ.get("redisHost")
             port = os.environ.get("redisPort")
@@ -315,8 +321,8 @@ def redis_health_check(request):
 
 @never_cache
 def get_random_recipe(request):
+    metrics.random_recipe.inc()
     if request.method == 'GET':
-
         try:
             recipe_obj = Recipes.objects.all()
             random_item = random.choice(recipe_obj)
@@ -339,8 +345,9 @@ def get_random_recipe(request):
     else:
         return JsonResponse("Bad Request", status=400, safe=False)
 
-
+@never_cache
 def health_check(request):
+    metrics.health_check.inc()
     try:
         if request.method == 'GET':
             return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
@@ -353,6 +360,7 @@ def health_check(request):
 @never_cache
 def get_new_recipe_by_id(request, id):
     try:
+        metrics.get_recipe_by_id.inc()
         recipe_obj = Recipes.objects.get(pk=id)
         cache_string = str(recipe_obj.id)
         if cache_string in cache:
@@ -381,9 +389,8 @@ def get_new_recipe_by_id(request, id):
 
 @never_cache
 def get_image_by_id(request, recipe_id, image_id):
-
     if request.method == "GET":
-
+        metrics.get_image_by_id.inc()
         try:
             recipe_obj = Recipes.objects.get(pk=recipe_id)
             image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
@@ -426,7 +433,7 @@ def delete_image_by_id(request, recipe_id, image_id):
     auth = request.headers.get('Authorization')
 
     if request.method == "DELETE":
-
+        metrics.delete_image.inc()
         if auth:
             auth_status = checkauth(auth)
 
@@ -480,6 +487,7 @@ def delete_image_from_s3(file_name):
 def recipe_crud(request, id):
     auth = request.headers.get('Authorization')
     if request.method == "DELETE":
+        metrics.delete_recipe.inc()
         if auth:
             auth_status = checkauth(auth)
 
@@ -519,6 +527,7 @@ def recipe_crud(request, id):
 
 
 def update_recipe(request, id, auth):
+    metrics.update_recipe.inc()
     if auth:
         auth_status = checkauth(auth)
     else:
