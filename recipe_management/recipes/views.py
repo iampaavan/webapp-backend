@@ -342,6 +342,10 @@ def get_random_recipe(request):
         except Recipes.DoesNotExist:
             return JsonResponse("Recipe not Found", status=404, safe=False)
 
+        except Exception:
+            return JsonResponse('No recipe found in the database', status=404, safe=False,
+                                json_dumps_params={'indent': 4})
+
     else:
         return JsonResponse("Bad Request", status=400, safe=False)
 
