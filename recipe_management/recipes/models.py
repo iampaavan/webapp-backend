@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django_prometheus.models import ExportModelOperationsMixin
 import uuid
 
 
-class User(models.Model):
+class User(ExportModelOperationsMixin('user'), models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=256)
@@ -14,7 +15,7 @@ class User(models.Model):
     account_updated = models.DateTimeField(auto_now=True)
 
 
-class NutritionalInformation(models.Model):
+class NutritionalInformation(ExportModelOperationsMixin('nutrition_info'), models.Model):
     calories = models.IntegerField()
     cholesterol_in_mg = models.DecimalField(max_digits=5, decimal_places=2)
     sodium_in_mg = models.IntegerField()
@@ -22,7 +23,7 @@ class NutritionalInformation(models.Model):
     protein_in_grams = models.DecimalField(max_digits=5, decimal_places=2)
 
 
-class Recipes(models.Model):
+class Recipes(ExportModelOperationsMixin('recipe'), models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_ts = models.DateTimeField(auto_now_add=True, editable=False)
     updated_ts = models.DateTimeField(auto_now=True, editable=False)
@@ -37,13 +38,13 @@ class Recipes(models.Model):
     nutrition_information = models.OneToOneField(NutritionalInformation, on_delete=models.CASCADE, null=True)
 
 
-class OrderedList(models.Model):
+class OrderedList(ExportModelOperationsMixin('order_list'), models.Model):
     position = models.IntegerField()
     items = models.CharField(max_length=256)
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='steps')
 
 
-class Image(models.Model):
+class Image(ExportModelOperationsMixin('images'), models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     urls = models.CharField(max_length=256)
     recipe = models.ForeignKey(Recipes, on_delete=models.CASCADE, blank=True, null=True, related_name='images')
