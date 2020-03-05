@@ -32,7 +32,7 @@ AWS_ACCESS_KEY = 'AKIAUJWRCG77QYGIF35U'
 AWS_SECRET_KEY = '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'
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-conn = False
+# conn = False
 
 # Connect to our Redis instance
 # try:
@@ -46,10 +46,11 @@ conn = False
 
 def user(request):
     if request.method == 'POST':
-        logging.info("Request Method: {}".format(request.method))
-        logging.info("Request Path: {}".format(request.path))
+        logging.debug("Request Method: {}".format(request.method))
+        logging.debug("Request Path: {}".format(request.path))
         metrics.user_created.inc()
         request_body = json.loads(request.body)
+        logging.debug("request body: {}".format(request_body))
         required_params = ['first_name', 'last_name', 'password', 'email_address']
         if not request_body:
             logging.debug("Request Body Empty. Body should have {}".format(", ".join(required_params)))
@@ -93,8 +94,8 @@ def user(request):
 
 def update_user(request):
     if request.method == 'PUT':
-        logging.info("Request Method: {}".format(request.method))
-        logging.info("Request Path: {}".format(request.path))
+        logging.debug("Request Method: {}".format(request.method))
+        logging.debug("Request Path: {}".format(request.path))
         metrics.user_updated.inc()
         auth = request.headers.get('Authorization')
         if auth:
@@ -103,6 +104,7 @@ def update_user(request):
             logging.debug("login credentials not provided")
             return JsonResponse("please provide login credentials", status=403, safe=False)
         request_body = json.loads(request.body)
+        logging.debug("request body: {}".format(request_body))
         required_params = ['first_name', 'last_name', 'password', 'email_address']
         if not request_body:
             logging.debug("Request Body Empty. Body should have {}".format(", ".join(required_params)))
@@ -137,10 +139,10 @@ def update_user(request):
             if changed:
                 ser = UserSerializer(user_obj)
                 user_obj.save()
-                logging.info("Updated user successfully")
+                logging.debug("success updated user with email: {}".format(email))
                 return JsonResponse(ser.data, status=200)
             else:
-                logging.info("No changes found to update")
+                logging.debug("No changes found to update")
                 return JsonResponse("No changes to update", status=200, safe=False)
         elif auth_status == "wrong_pwd":
             return JsonResponse("Wrong Password", status=403, safe=False)
@@ -156,8 +158,8 @@ def update_user(request):
 
 
 def get_user(request):
-    logging.info("Request Method: {}".format(request.method))
-    logging.info("Request Path: {}".format(request.path))
+    logging.debug("Request Method: {}".format(request.method))
+    logging.debug("Request Path: {}".format(request.path))
     metrics.get_user.inc()
     auth = request.headers.get('Authorization')
     if auth:
@@ -169,7 +171,7 @@ def get_user(request):
     if auth_status == 'success':
         user_obj = User.objects.get(email_address=email)
         serialize = GetUserSerializer(user_obj)
-        logging.info("successfully got user details: {}".format(serialize.data))
+        logging.debug("success got user details: {}".format(serialize.data))
         return JsonResponse(serialize.data, status=200)
 
     elif auth_status == 'wrong_pwd':
@@ -237,7 +239,7 @@ def create_recipe(request):
                 logging.info("success saved order list to DB")
 
             ser = RecipeSerializer(recipe_obj)
-            cache.set(str(recipe_obj.id), str(ser.data), timeout=CACHE_TTL)
+            cache.set(str(recipe_obj.id), recipe_obj, timeout=CACHE_TTL)
             logging.info("success set recipe in cache")
             logging.info("success Recipe created")
             return JsonResponse(ser.data, status=201)
@@ -256,8 +258,8 @@ def create_recipe(request):
 def upload_image(request, id):
     region = 'us-east-1'
     if request.method == "POST":
-        logging.info("Request Method: {}".format(request.method))
-        logging.info("Request Path: {}".format(request.path))
+        logging.debug("Request Method: {}".format(request.method))
+        logging.debug("Request Path: {}".format(request.path))
         metrics.image_uploaded.inc()
         auth = request.headers.get('Authorization')
         file = request.FILES['file']
@@ -265,30 +267,38 @@ def upload_image(request, id):
         try:
             if auth_status == "success":
                 user = User.objects.get(email_address=email)
-                recipe_obj = Recipes.objects.get(pk=id)
+                cache_string = str(id)
+                if cache_string in cache:
+                    recipe_obj = cache.get(cache_string)
+                    logging.debug("Cache hit success!! recipe found in cache")
+                else:
+                    recipe_obj = Recipes.objects.get(pk=id)
+                    logging.debug("Cache miss!! recipe not found in cache")
                 if not (recipe_obj.author_id == user):
                     logging.debug("Not authorized to update recipe")
                     return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
                 else:
                     file_name = file.name
                     file_name = file_name + str(uuid.uuid4())
-                    logging.info("File Name: {}".format(file_name))
+                    logging.debug("File Name: {}".format(file_name))
                     s3_bucket = BUCKET
                     s3_client = boto3.client(
                         's3',
                         aws_access_key_id=AWS_ACCESS_KEY,
                         aws_secret_access_key=AWS_SECRET_KEY)
                     s3_client.upload_fileobj(file, s3_bucket, file_name)
+                    logging.debug("success image uploaded to bucket {}".format(s3_bucket))
                     s3_url = f"https://s3-{region}.amazonaws.com/{s3_bucket}/{file_name}"
-                    logging.info("S3 URL: {}".format(s3_url))
+                    logging.debug("S3 URL: {}".format(s3_url))
 
                     img_object = Image(urls=s3_url, recipe=recipe_obj)
                     img_object.save()
-                    logging.info("success image attached to recipe id: {}".format(recipe_obj.id))
+                    logging.debug("success image attached to recipe id: {}".format(recipe_obj.id))
                     ser = ImageSerializer(img_object)
-                    serialize = RecipeSerializer(recipe_obj)
-                    cache.set(str(recipe_obj.id), str(serialize.data), timeout=CACHE_TTL)
-                    logging.info("success save recipe in cache")
+                    cache.set(str(recipe_obj.id), recipe_obj, timeout=CACHE_TTL)
+                    logging.debug("success save recipe in cache")
+                    cache.set(str(img_object.id), img_object, timeout=CACHE_TTL)
+                    logging.debug("success save image in cache")
                 return JsonResponse(ser.data, status=200)
 
             elif auth_status == "wrong_pwd":
@@ -342,6 +352,7 @@ def redis_health_check(request):
             password = os.environ.get("redisPass")
             conn = redis.StrictRedis(host=host, port=port, password=password)
             if conn.ping():
+                logging.debug("success redis ping")
                 return HttpResponse("Redis Connected", status=200, content_type='application/json')
             else:
                 return HttpResponse("Redis Connection failed", status=400, content_type='application/json')
@@ -353,13 +364,13 @@ def redis_health_check(request):
 def get_random_recipe(request):
     metrics.random_recipe.inc()
     if request.method == 'GET':
-        logging.info("Request Method: {}".format(request.method))
-        logging.info("Request Path: {}".format(request.path))
+        logging.debug("Request Method: {}".format(request.method))
+        logging.debug("Request Path: {}".format(request.path))
         try:
             recipe_obj = Recipes.objects.all()
             random_item = random.choice(recipe_obj)
             serialize = RecipeSerializer(random_item)
-            logging.info("success get random recipe")
+            logging.debug("success get random recipe")
             return JsonResponse(serialize.data, status=200, safe=False, json_dumps_params={'indent': 4})
 
         except Recipes.DoesNotExist:
@@ -385,52 +396,56 @@ def health_check(request):
 @never_cache
 def get_new_recipe_by_id(request, id):
     try:
-        logging.info("Request Method: {}".format(request.method))
-        logging.info("Request Path: {}".format(request.path))
+        logging.debug("Request Method: {}".format(request.method))
+        logging.debug("Request Path: {}".format(request.path))
         metrics.get_recipe_by_id.inc()
         cache_string = str(id)
         if cache_string in cache:
             output = cache.get(cache_string)
-            logging.info("Cache Hit Success get recipe")
-            return JsonResponse(output, status=200, safe=False, json_dumps_params={'indent': 4})
+            logging.debug("Cache Hit Success!! recipe found in cache")
+            ser = RecipeSerializer(output)
+            return JsonResponse(ser.data, status=200, safe=False)
         else:
-            try:
-                recipe_obj = Recipes.objects.get(pk=id)
-                serlializer = RecipeSerializer(recipe_obj)
-                logging.info("Cache miss get recipe from db")
-                cache.set(str(recipe_obj.id), str(serlializer.data), timeout=CACHE_TTL)
-                logging.info("Set cache success recipe")
-                return JsonResponse(serlializer.data, status=200)
-            except Recipes.DoesNotExist as e:
-                logging.debug("Recipe not found")
-                return JsonResponse(e, status=404, safe=False)
+            recipe_obj = Recipes.objects.get(pk=id)
+            serlializer = RecipeSerializer(recipe_obj)
+            logging.debug("Cache miss!! recipe not found in cache")
+            cache.set(str(recipe_obj.id), recipe_obj, timeout=CACHE_TTL)
+            logging.debug("Set cache success recipe")
+            return JsonResponse(serlializer.data, status=200)
     except ValidationError as e:
         logging.debug("Recipe id {} Not Found".format(id))
         return JsonResponse(e, status=404, safe=False)
     except Recipes.DoesNotExist as e:
-        logging.debug("Recipe not found")
-        return JsonResponse(e, status=404, safe=False)
+        logging.debug("Recipe {} not found".format(id))
+        return JsonResponse("recipe {} not found".format(id), status=404, safe=False)
 
 
 @never_cache
 def get_image_by_id(request, recipe_id, image_id):
     if request.method == "GET":
-        logging.info("Request Method: {}".format(request.method))
-        logging.info("Request Path: {}".format(request.path))
+        logging.debug("Request Method: {}".format(request.method))
+        logging.debug("Request Path: {}".format(request.path))
         metrics.get_image_by_id.inc()
         try:
             cache_string = str(image_id)
-            if cache_string in cache:
+            if (cache_string in cache and Recipes.objects.filter(pk=recipe_id).exists()):
                 output = cache.get(cache_string)
-                logging.info("cache hit image saved to cache")
-                return JsonResponse(output, status=200, safe=False, json_dumps_params={'indent': 4})
-
+                ser = ImageSerializer(output)
+                logging.debug("cache hit image found in cache")
+                return JsonResponse(ser.data, status=200, safe=False)
             else:
-                recipe_obj = Recipes.objects.get(pk=recipe_id)
+                if str(recipe_id) in cache:
+                    recipe_obj = cache.get(str(recipe_id))
+                    logging.debug("cache hit!! recipe found in cache")
+                else:
+                    recipe_obj = Recipes.objects.get(pk=recipe_id)
+                    logging.debug("cache miss!! recipe not found in cache")
+                    cache.set(str(recipe_obj.id), recipe_obj, timeout=CACHE_TTL)
+                    logging.debug("success cache set recipe")
                 image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
                 serializer = ImageSerializer(image_obj)
-                cache.set(str(image_obj.id), str(serializer.data), timeout=CACHE_TTL)
-                logging.info("success cache set image")
+                cache.set(str(image_obj.id), image_obj, timeout=CACHE_TTL)
+                logging.debug("success cache set image")
                 return JsonResponse(serializer.data, status=200)
 
         except ValidationError:
@@ -448,22 +463,16 @@ def get_image_by_id(request, recipe_id, image_id):
         except Exception as e:
             logging.debug(e)
             return JsonResponse("Unknown  Error.", status=404, safe=False)
-
-    elif request.method == 'POST':
-        logging.debug("Invalid request method {} {}".format(request.method, request.path))
-        return HttpResponse(f"Invalid request type: {request.method}", status=403)
-
-    elif request.method == 'PUT':
-        logging.debug("Invalid request method {} {}".format(request.method, request.path))
-        return HttpResponse(f"Invalid request type: {request.method}", status=403)
-
     elif request.method == 'DELETE':
         return delete_image_by_id(request, recipe_id, image_id)
 
+    else:
+        logging.debug("Invalid request method {} {}".format(request.method, request.path))
+        return HttpResponse(f"Invalid request type: {request.method}", status=403)
 
 def delete_image_by_id(request, recipe_id, image_id):
-    logging.info("Request Method: {}".format(request.method))
-    logging.info("Request Path: {}".format(request.path))
+    logging.debug("Request Method: {}".format(request.method))
+    logging.debug("Request Path: {}".format(request.path))
     auth = request.headers.get('Authorization')
     metrics.delete_image.inc()
     if auth:
@@ -474,16 +483,23 @@ def delete_image_by_id(request, recipe_id, image_id):
     if auth_status == 'success':
         try:
             user_obj = User.objects.get(email_address=email)
-            recipe_obj = Recipes.objects.get(pk=recipe_id, author_id=user_obj)
+            if str(recipe_id) in cache:
+                recipe_obj = cache.get(str(recipe_id))
+                logging.info("cache hit!! recipe found in cache")
+            else:
+                recipe_obj = Recipes.objects.get(pk=recipe_id, author_id=user_obj)
+                cache.set(str(recipe_obj.id), recipe_obj, timeout=CACHE_TTL)
             image_obj = Image.objects.get(pk=image_id, recipe=recipe_obj)
-            Image.objects.get(pk=image_id, recipe=recipe_obj).delete()
+            # Image.objects.get(pk=image_id, recipe=recipe_obj).delete()
+            image_obj.delete()
             url = image_obj.urls
             file_name = url.split('/')[-1]
             delete_image_from_s3(file_name)
-            cache_string = str(recipe_obj.id)
+            cache_string = str(image_obj.id)
             if cache_string in cache:
                 cache.delete(cache_string)
-                logging.info("cache recipe delete")
+                logging.debug("image delete from cache")
+            logging.debug("success image deleted")
             return JsonResponse("Image Deleted Successfully", status=204, safe=False)
 
         except ValidationError as e:
@@ -536,10 +552,10 @@ def recipe_crud(request, id):
         if auth_status == 'success':
             try:
                 user_obj = User.objects.get(email_address=email)
-                recipe_obj = Recipes.objects.get(pk=id, author_id=user_obj.id)
+                # recipe_obj = Recipes.objects.get(pk=id, author_id=user_obj.id)
                 Recipes.objects.get(pk=id, author_id=user_obj.id).delete()
                 logging.info("success recipe deleted")
-                cache_string = str(recipe_obj.id)
+                cache_string = str(id)
                 if cache_string in cache:
                     cache.delete(cache_string)
                     logging.info("recipe deleted from cache")
@@ -572,8 +588,8 @@ def recipe_crud(request, id):
 
 
 def update_recipe(request, id, auth):
-    logging.info("Request Method: {}".format(request.method))
-    logging.info("Request Path: {}".format(request.path))
+    logging.debug("Request Method: {}".format(request.method))
+    logging.debug("Request Path: {}".format(request.path))
     metrics.update_recipe.inc()
     if auth:
         auth_status = checkauth(auth)
@@ -581,7 +597,7 @@ def update_recipe(request, id, auth):
         logging.debug("login credentials not provided")
         return JsonResponse("please provide login credentials", status=401, safe=False)
     request_body = json.loads(request.body)
-    logging.info("Body: {}".format(request_body))
+    logging.debug("Body: {}".format(request_body))
     if auth_status == 'success':
         required_params = ['cook_time_in_min', 'prep_time_in_min', 'title', 'cuisine', 'servings', 'ingredients',
                            'steps', 'nutrition_information']
@@ -609,11 +625,13 @@ def update_recipe(request, id, auth):
         user = User.objects.get(email_address=email)
 
         try:
-            recipe = Recipes.objects.get(pk=id)
-            cache_string = str(recipe.id)
+            cache_string = str(id)
             if cache_string in cache:
-                cache.delete(cache_string)
-                logging.info("recipe cache delete")
+                recipe = cache.get(cache_string)
+                logging.info("cache hit!! recipe found in cache")
+            else:
+                recipe = Recipes.objects.get(pk=id)
+                logging.info("cache miss!!! recipe not found in cache")
             if not (recipe.author_id == user):
                 logging.debug("Not authorized to update recipe")
                 return JsonResponse("You are not authorized to update this recipe", status=401, safe=False)
@@ -646,7 +664,7 @@ def update_recipe(request, id, auth):
                 recipe.save()
                 logging.info("Success recipe updated")
                 serial = RecipeSerializer(recipe)
-                cache.set(str(recipe.id), str(serial.data), timeout=CACHE_TTL)
+                cache.set(str(recipe.id), recipe, timeout=CACHE_TTL)
                 logging.info("cache set with new recipe")
                 return JsonResponse(serial.data, status=200)
         except ValidationError:
