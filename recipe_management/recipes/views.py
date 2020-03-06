@@ -440,7 +440,7 @@ def get_image_by_id(request, recipe_id, image_id):
         metrics.get_image_by_id.inc()
         try:
             cache_string = str(image_id)
-            if (cache_string in cache and Recipes.objects.filter(pk=recipe_id).exists()):
+            if cache_string in cache and Recipes.objects.filter(pk=recipe_id).exists():
                 output = cache.get(cache_string)
                 ser = ImageSerializer(output)
                 logging.debug("cache hit image found in cache")
