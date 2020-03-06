@@ -130,7 +130,7 @@ REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=
 # REDIS_CONN_POOL_1 = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
 
 PROMETHEUS_METRICS_EXPORT_PORT = 80
-PROMETHEUS_METRICS_EXPORT_ADDRESS = 'prometheus-server.default.svc.cluster.local'
+PROMETHEUS_METRICS_EXPORT_ADDRESS = '100.70.176.24'
 
 # Cache time to live is 10 minutes.
 CACHE_TTL = 60 * 10
