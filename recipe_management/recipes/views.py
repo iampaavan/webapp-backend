@@ -398,6 +398,7 @@ def health_check(request):
     metrics.health_check.inc()
     try:
         if request.method == 'GET':
+            logging.debug('Health Check API')
             return HttpResponse("System Functioning Normally", status=200, content_type='application/json')
         else:
             return HttpResponse("Abort", status=400, content_type='application/json')
