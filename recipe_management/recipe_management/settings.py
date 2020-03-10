@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_prometheus',
     'recipe_management',
-    'django_elasticsearch_dsl',
 ]
 
 MIDDLEWARE = [
@@ -186,9 +185,3 @@ CORS_ORIGIN_REGEX_WHITELIST = [
     'http://localhost:8000',
 ]
 
-
-ELASTICSEARCH_DSL={
-    'default': {
-        'hosts': 'localhost:9200'
-    },
-}
