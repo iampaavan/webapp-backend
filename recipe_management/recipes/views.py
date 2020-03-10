@@ -28,13 +28,10 @@ REQUEST_TIME = Summary("request_processing_seconds", "Time spent processing requ
 
 email = ""
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=logging.DEBUG)
-# BUCKET = os.environ.get("BUCKET_NAME")
-# AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
-# AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
+BUCKET = os.environ.get("BUCKET_NAME")
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
 
-BUCKET = 'dev-hgadhiya-csye7374-image-upload'
-AWS_ACCESS_KEY = 'AKIAUJWRCG77QYGIF35U'
-AWS_SECRET_KEY = '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'
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 # conn = False
