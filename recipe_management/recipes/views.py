@@ -34,16 +34,6 @@ AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
 
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-# conn = False
-
-# Connect to our Redis instance
-# try:
-#     REDIS_CONN_POOL_1 = settings.REDIS_CONN_POOL_1
-#     conn = redis.Redis(connection_pool=REDIS_CONN_POOL_1)
-#     logging.debug(conn)
-#
-# except Exception as connection_exception:
-#     logging.debug(connection_exception)
 
 
 def user(request):
