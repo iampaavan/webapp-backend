@@ -471,6 +471,7 @@ def get_image_by_id(request, recipe_id, image_id):
         logging.debug("Invalid request method {} {}".format(request.method, request.path))
         return HttpResponse(f"Invalid request type: {request.method}", status=403)
 
+
 def delete_image_by_id(request, recipe_id, image_id):
     logging.debug("Request Method: {}".format(request.method))
     logging.debug("Request Path: {}".format(request.path))
@@ -533,6 +534,7 @@ def delete_image_from_s3(file_name):
         bucket = Bucket(conn, BUCKET)
         k = Key(bucket=bucket, name=file_name)
         k.delete()
+        logging.debug('Image deleted from S3 bucket.')
         logging.info("success delete image from s3")
     except Exception as e:
         logging.debug(e)
