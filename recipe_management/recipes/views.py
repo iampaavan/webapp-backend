@@ -337,6 +337,7 @@ def get_newest_recipe(request):
 
 def redis_health_check(request):
     if request.method == 'GET':
+        logging.debug('Redis Health Check API')
         metrics.redis_health.inc()
         try:
             host = os.environ.get("redisHost")
