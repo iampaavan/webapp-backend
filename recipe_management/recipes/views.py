@@ -313,6 +313,7 @@ def upload_image(request, id):
         logging.debug("Invalid request method {} {}".format(request.method, request.path))
         return JsonResponse("Invalid request method", status=400, safe=False)
 
+
 @never_cache
 def get_newest_recipe(request):
     if request.method == 'GET':
