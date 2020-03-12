@@ -23,6 +23,7 @@ COPY --from=build-stage /usr/src/app/recipe_management.conf /etc/nginx/conf.d/de
 FROM build-stage as build2
 RUN pwd
 WORKDIR /usr/src/app/recipe_management
+RUN ls -lrt
 RUN python manage.py migrate
 RUN ls -lrt
 WORKDIR /usr/src/app
