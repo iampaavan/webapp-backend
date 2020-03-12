@@ -24,7 +24,7 @@ FROM build-stage as build2
 RUN pwd
 WORKDIR /usr/src/app/recipe_management
 RUN ls -lrt
-RUN python manage.py migrate
+CMD [ "python", "manage.py", "migrate" ]
 RUN ls -lrt
 WORKDIR /usr/src/app
 RUN pwd
