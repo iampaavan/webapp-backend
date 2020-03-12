@@ -18,7 +18,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
-# PROMETHEUS_METRICS_EXPORT_PORT_RANGE = range(8001, 8050)
 
 # Application definition
 
