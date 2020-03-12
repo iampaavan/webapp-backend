@@ -21,14 +21,6 @@ COPY --from=build-stage /usr/src/app/recipe_management.conf /etc/nginx/conf.d/de
 #RUN ln -s /etc/nginx/sites-available/recipe_management.conf /etc/nginx/sites-enabled
 
 FROM build-stage as build2
-RUN pwd
-WORKDIR /usr/src/app/recipe_management
-RUN ls -lrt
-CMD [ "python", "manage.py", "migrate" ]
-RUN ls -lrt
-WORKDIR /usr/src/app
-RUN pwd
-RUN ls -lrt
 RUN chmod 777 entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
 
