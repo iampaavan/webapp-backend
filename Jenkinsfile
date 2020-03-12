@@ -4,6 +4,7 @@ pipeline
 	  {
 			registry = credentials("docker_registery")
 			registryCredential = 'dockerhub'
+			githubCredential = 'github'
 			dockerImage = ''
 			GIT_COMMIT = """${sh(
                 returnStdout: true,
@@ -42,6 +43,20 @@ pipeline
 							}
 					 }
 				}
+			}
+			stage('clone helm chart repo')
+			{
+			    steps
+			    {
+			        script
+			        {
+			            git (branch: 'jenkins-test',
+			                 credentialsId: githubCredential,
+			                 url: 'https://github.com/hemalgadhiya/helm-charts.git')
+			            sh "pwd"
+			            sh "ls"
+			        }
+			    }
 			}
 	}
 }
