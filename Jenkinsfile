@@ -70,7 +70,7 @@ def getChartVersion(){
 }
 
 def generateNewVersion(release){
-    def (major, minor, patch) = getChartVersion().tokenize(".").toInteger()
+    def (major, minor, patch) = getChartVersion().tokenize(".").collect{element -> return element.toInteger()}
     println(major.getClass())
     def newVersion
     if (release == 'major'){
