@@ -111,3 +111,4 @@ def generateNewVersion(release){
     }
     return newVersion
 }
+
