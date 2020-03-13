@@ -9,6 +9,7 @@ pipeline
 		    access_key = credentials("aws_access_key")
 		    secret_key = credentials("aws_secret_key")
 		    rds_url = credentials("rds_url")
+		    redis_password = credentials("redis_password")
 			registryCredential = 'dockerhub'
 			githubCredential = 'github'
 			dockerImage = ''
@@ -65,31 +66,30 @@ pipeline
 			            newVersion = generateNewVersion("major")
 			            echo latestversion
 			            echo newVersion
+			            sh ("yq r ./backend/Chart.yaml version")
 			            sh ("yq w -i ./backend/Chart.yaml 'version' ${newVersion}")
 			            sh ("yq r ./backend/Chart.yaml version")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ("yq w -i ./backend/values.yaml 'image.name' '${registry}:${GIT_COMMIT}'")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ("yq w -i ./backend/values.yaml 'imageCredentials.username' ${docker_username}")
-			            sh ("yq r ./backend/values.yaml 'imageCredentials.username'")
 			            sh ("yq w -i ./backend/values.yaml 'imageCredentials.password' ${docker_password}")
-			            sh ("yq r ./backend/values.yaml 'imageCredentials.password'")
 			            sh ("yq w -i ./backend/values.yaml 'bucketname' ${s3_bucket}")
-			            sh ("yq r ./backend/values.yaml 'bucketname'")
 			            sh ("yq w -i ./backend/values.yaml 'awsAccessKey' ${access_key}")
-			            sh ("yq r ./backend/values.yaml 'awsAccessKey'")
 			            sh ("yq w -i ./backend/values.yaml 'awsSecretKey' ${secret_key}")
-			            sh ("yq r ./backend/values.yaml 'awsSecretKey'")
 			            sh ("yq w -i ./backend/values.yaml 'dbsecret.rdsurl' ${rds_url}")
-			            sh ("yq r ./backend/values.yaml 'dbsecret.rdsurl'")
+			            sh ("yq w -i ./backend/values.yaml 'redis.password' ${redis_password}")
 			            sh ('git config --global user.email "hemalgadhiya@gmail.com"')
 			            sh ('git config --global user.name "Hemal Gadhiya"')
+			            sh ('git config --global push.default current')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
+			            sh ('git push origin jenkins-test')
+//                         sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
                     }
 			        }
+
 			    }
 			}
 	}
@@ -101,7 +101,6 @@ def getChartVersion(){
 
 def generateNewVersion(release){
     def (major, minor, patch) = getChartVersion().tokenize(".").collect{element -> return element.toInteger()}
-    println(major.getClass())
     def newVersion
     if (release == 'major'){
         newVersion = "${major + 1}.0.0"
