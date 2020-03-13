@@ -22,36 +22,36 @@ pipeline
 	  agent any
 	  stages
 	  {
-//  			stage('Git Checkout')
-//  			{
-//  		   steps
-//  		   		{
-//  						checkout scm
-//  					}
-//  		}
-// 			stage('Build Docker Image')
-// 			{
-// 				steps
-// 				{
-// 					script
-// 					{
-// 						dockerImage = docker.build("${registry}:${GIT_COMMIT}")
-// 					}
-// 				}
-// 			}
-// 			stage('Deploy Docker Image to DockerHub')
-// 			{
-// 				steps
-// 				{
-// 					 script
-// 					 {
-// 						docker.withRegistry( '', registryCredential )
-// 							{
-// 								dockerImage.push()
-// 							}
-// 					 }
-// 				}
-// 			}
+ 			stage('Git Checkout')
+ 			{
+ 		   steps
+ 		   		{
+ 						checkout scm
+ 					}
+ 		}
+			stage('Build Docker Image')
+			{
+				steps
+				{
+					script
+					{
+						dockerImage = docker.build("${registry}:${GIT_COMMIT}")
+					}
+				}
+			}
+			stage('Deploy Docker Image to DockerHub')
+			{
+				steps
+				{
+					 script
+					 {
+						docker.withRegistry( '', registryCredential )
+							{
+								dockerImage.push()
+							}
+					 }
+				}
+			}
 			stage('clone helm chart repo')
 			{
 			    steps
@@ -64,7 +64,7 @@ pipeline
 			            sh ("pwd")
 			            sh ("ls")
 			            latestversion = getChartVersion()
-			            newVersion = generateNewVersion("major")
+			            newVersion = generateNewVersion("patch")
 			            echo latestversion
 			            echo newVersion
 			            sh ("yq r ./backend/Chart.yaml version")
@@ -84,9 +84,7 @@ pipeline
 			            sh ('git config --global user.name "Hemal Gadhiya"')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
-			            sh ('git remote -v')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-// 			            sh ('git push origin jenkins-test')
                         sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
                     }
 			        }
