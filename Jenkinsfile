@@ -82,7 +82,7 @@ pipeline
 			            sh ("yq r ./backend/values.yaml 'awsSecretKey'")
 			            sh ("yq w -i ./backend/values.yaml 'dbsecret.rdsurl' ${rds_url}")
 			            sh ("yq r ./backend/values.yaml 'dbsecret.rdsurl'")
-			            sh ("git add -all")
+			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh('git push origin jenkins-test')
