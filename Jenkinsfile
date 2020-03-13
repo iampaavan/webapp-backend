@@ -66,5 +66,6 @@ def getChartVersion(){
     def version = sh (returnStdout: true, script: 'yq r ./backend/Chart.yaml version')
     println(version.getClass())
     def split = version.split(".")
+    println(version.getClass())
     return split
 }
