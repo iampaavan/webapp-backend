@@ -53,12 +53,14 @@ pipeline
 			            git (branch: 'jenkins-test',
 			                 credentialsId: githubCredential,
 			                 url: 'https://github.com/hemalgadhiya/helm-charts.git')
-			            sh "pwd"
-			            sh "ls"
+			            sh ("pwd")
+			            sh ("ls")
 			            latestversion = getChartVersion()
 			            newVersion = generateNewVersion("major")
 			            echo latestversion
 			            echo newVersion
+			            sh ("yq w -i ./backend/Chart.yaml 'version' ${newVersion}")
+			            sh ("yq r ./backend/Chart.yaml version")
 			        }
 			    }
 			}
