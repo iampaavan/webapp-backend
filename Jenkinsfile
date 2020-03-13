@@ -13,7 +13,6 @@ pipeline
 			registryCredential = 'dockerhub'
 			githubCredential = 'github'
 			dockerImage = ''
-			git_url = credentials("github_url")
 			GIT_COMMIT = """${sh(
                 returnStdout: true,
                 script: 'git rev-parse HEAD'
