@@ -56,7 +56,9 @@ pipeline
 			            sh "pwd"
 			            sh "ls"
 			            latestversion = getChartVersion()
+			            newVersion = generateNewVersion("major")
 			            echo latestversion
+			            echo newVersion
 			        }
 			    }
 			}
@@ -71,6 +73,13 @@ def generateNewVersion(release){
     def (major, minor, patch) = getChartVersion().tokenize(".")
     def newVersion
     if (release == 'major'){
-
+        newVersion = "${major + 1}.0.0"
     }
+    else if (release == 'minor'){
+        newVersion = "${major}.${minor + 1}.0"
+    }
+    else if (release == 'patch'){
+        newVersion = "${major}.${minor}.${patch + 1}"
+    }
+    return newVersion
 }
