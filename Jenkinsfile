@@ -13,6 +13,7 @@ pipeline
 			registryCredential = 'dockerhub'
 			githubCredential = 'github'
 			dockerImage = ''
+			git_url = credentials("github_url")
 			GIT_COMMIT = """${sh(
                 returnStdout: true,
                 script: 'git rev-parse HEAD'
@@ -59,7 +60,7 @@ pipeline
 			        {
 			            git (branch: 'jenkins-test',
 			                 credentialsId: githubCredential,
-			                 url: 'https://github.com/hemalgadhiya/helm-charts.git')
+			                 url: 'https://${git_url}')
 			            sh ("pwd")
 			            sh ("ls")
 			            latestversion = getChartVersion()
@@ -85,8 +86,7 @@ pipeline
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            sh ('git remote -v')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-			            sh ('git push origin jenkins-test')
-//                         sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
+                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${git_url} jenkins-test')
                     }
 			        }
 
