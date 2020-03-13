@@ -61,6 +61,8 @@ pipeline
 			            echo newVersion
 			            sh ("yq w -i ./backend/Chart.yaml 'version' ${newVersion}")
 			            sh ("yq r ./backend/Chart.yaml version")
+			            sh ("cd backend")
+			            sh ("ls")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			        }
 			    }
