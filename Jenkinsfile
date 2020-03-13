@@ -81,9 +81,9 @@ pipeline
 			            sh ("yq w -i ./backend/values.yaml 'redis.password' ${redis_password}")
 			            sh ('git config --global user.email "hemalgadhiya@gmail.com"')
 			            sh ('git config --global user.name "Hemal Gadhiya"')
-			            sh ('git config --global push.default current')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
+			            sh ('git remote -v')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
 			            sh ('git push origin jenkins-test')
 //                         sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
