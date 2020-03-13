@@ -55,8 +55,14 @@ pipeline
 			                 url: 'https://github.com/hemalgadhiya/helm-charts.git')
 			            sh "pwd"
 			            sh "ls"
+			            latestversion = getChartVersion()
+			            echo latestversion
 			        }
 			    }
 			}
 	}
+}
+def getChartVersion(){
+    def version = sh (returnStdout: true, script: 'yq r ./backend/Chart.yaml version')
+    return version
 }
