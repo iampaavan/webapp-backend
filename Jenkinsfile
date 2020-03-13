@@ -65,7 +65,9 @@ pipeline
 def getChartVersion(){
     def version = sh (returnStdout: true, script: 'yq r ./backend/Chart.yaml version')
     println(version.getClass())
-    def split = version.split(".")
-    println(split)
-    return split
+    def (major, minor, patch ) = version.tokenize(".")
+    println(major)
+    println(minor)
+    println(patch)
+    return major
 }
