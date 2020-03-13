@@ -87,7 +87,7 @@ pipeline
 			            sh ('git remote -v')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
 // 			            sh ('git push origin jenkins-test')
-                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${git_url}')
+                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
                     }
 			        }
 
