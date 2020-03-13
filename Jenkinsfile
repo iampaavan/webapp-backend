@@ -71,6 +71,7 @@ def getChartVersion(){
 
 def generateNewVersion(release){
     def (major, minor, patch) = getChartVersion().tokenize(".")
+    println(major.getClass())
     def newVersion
     if (release == 'major'){
         newVersion = "${major + 1}.0.0"
