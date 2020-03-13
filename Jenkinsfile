@@ -14,36 +14,36 @@ pipeline
 	  agent any
 	  stages
 	  {
- 			stage('Git Checkout')
- 			{
- 		   steps
- 		   		{
- 						checkout scm
- 					}
- 		}
-			stage('Build Docker Image')
-			{
-				steps
-				{
-					script
-					{
-						dockerImage = docker.build("${registry}:${GIT_COMMIT}")
-					}
-				}
-			}
-			stage('Deploy Docker Image to DockerHub')
-			{
-				steps
-				{
-					 script
-					 {
-						docker.withRegistry( '', registryCredential )
-							{
-								dockerImage.push()
-							}
-					 }
-				}
-			}
+//  			stage('Git Checkout')
+//  			{
+//  		   steps
+//  		   		{
+//  						checkout scm
+//  					}
+//  		}
+// 			stage('Build Docker Image')
+// 			{
+// 				steps
+// 				{
+// 					script
+// 					{
+// 						dockerImage = docker.build("${registry}:${GIT_COMMIT}")
+// 					}
+// 				}
+// 			}
+// 			stage('Deploy Docker Image to DockerHub')
+// 			{
+// 				steps
+// 				{
+// 					 script
+// 					 {
+// 						docker.withRegistry( '', registryCredential )
+// 							{
+// 								dockerImage.push()
+// 							}
+// 					 }
+// 				}
+// 			}
 			stage('clone helm chart repo')
 			{
 			    steps
@@ -66,6 +66,6 @@ def getChartVersion(){
     def version = sh (returnStdout: true, script: 'yq r ./backend/Chart.yaml version')
     println(version.getClass())
     def split = version.split(".")
-    println(version.getClass())
+    println(split)
     return split
 }
