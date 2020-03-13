@@ -62,6 +62,8 @@ pipeline
 			            sh ("yq w -i ./backend/Chart.yaml 'version' ${newVersion}")
 			            sh ("yq r ./backend/Chart.yaml version")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
+			            sh ("yq w -i ./backend/values.yaml" 'image.name' '${registry}:${GIT_COMMIT}')
+			            sh ("yq r ./backend/values.yaml 'image.name'")
 			        }
 			    }
 			}
