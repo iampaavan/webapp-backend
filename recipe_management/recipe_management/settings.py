@@ -104,6 +104,7 @@ CACHES = {
 REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
+
 # DATABASES = {
 #     'default': {
 #         "ENGINE": "django_prometheus.db.backends.postgresql",
@@ -132,6 +133,33 @@ REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=
 # # Redis Settings
 # REDIS_CONN_POOL_1 = redis.ConnectionPool(host='localhost', port=6379, db=0, password='cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO')
 
+
+
+# DATABASES = {
+#     'default': {
+#         "ENGINE": "django_prometheus.db.backends.postgresql",
+#         'NAME': 'recipe',
+#         'USER': 'postgres',
+#         'PASSWORD': 'root',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
+#
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_prometheus.cache.backends.redis.RedisCache",
+#         "LOCATION": [
+#             'redis://127.0.0.1:6379'
+#         ],
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#         },
+#     }
+# }
+#
+# REDIS_CONN_POOL_1 = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
 
 PROMETHEUS_METRICS_EXPORT_PORT = 8002
 PROMETHEUS_METRICS_EXPORT_ADDRESS = ''
