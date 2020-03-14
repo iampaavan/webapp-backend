@@ -92,6 +92,7 @@ def update_user(request):
         metrics.user_updated.inc()
         auth = request.headers.get('Authorization')
         if auth:
+            logging.debug(auth)
             auth_status = checkauth(auth)
         else:
             logging.debug("login credentials not provided")
