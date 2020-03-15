@@ -3,13 +3,6 @@ pipeline
 	  environment
 	  {
 			registry = credentials("docker_registery")
-			docker_username = credentials("user_name")
-		    docker_password = credentials("password")
-		    s3_bucket = credentials("bucketname")
-		    access_key = credentials("aws_access_key")
-		    secret_key = credentials("aws_secret_key")
-		    rds_url = credentials("rds_url")
-		    redis_password = credentials("redis_password")
 			registryCredential = 'dockerhub'
 			githubCredential = 'github'
 			dockerImage = ''
@@ -59,7 +52,7 @@ pipeline
 			        {
 			            git (branch: 'jenkins-test',
 			                 credentialsId: githubCredential,
-			                 url: 'https://github.com/hemalgadhiya/helm-charts.git')
+			                 url: 'https://github.com/iampaavan/helm-charts.git')
 			            sh ("pwd")
 			            sh ("ls")
 			            latestversion = getChartVersion()
@@ -72,19 +65,12 @@ pipeline
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ("yq w -i ./backend/values.yaml 'image.name' '${registry}:${GIT_COMMIT}'")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
-// 			            sh ("yq w -i ./backend/values.yaml 'imageCredentials.username' ${docker_username}")
-// 			            sh ("yq w -i ./backend/values.yaml 'imageCredentials.password' ${docker_password}")
-// 			            sh ("yq w -i ./backend/values.yaml 'bucketname' ${s3_bucket}")
-// 			            sh ("yq w -i ./backend/values.yaml 'awsAccessKey' ${access_key}")
-// 			            sh ("yq w -i ./backend/values.yaml 'awsSecretKey' ${secret_key}")
-// 			            sh ("yq w -i ./backend/values.yaml 'dbsecret.rdsurl' ${rds_url}")
-// 			            sh ("yq w -i ./backend/values.yaml 'redis.password' ${redis_password}")
-			            sh ('git config --global user.email "hemalgadhiya@gmail.com"')
-			            sh ('git config --global user.name "Hemal Gadhiya"')
+			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
+			            sh ('git config --global user.name "iampaavan"')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/hemalgadhiya/helm-charts.git jenkins-test')
+                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/iampaavan/helm-charts.git jenkins-test')
                     }
 			        }
 
