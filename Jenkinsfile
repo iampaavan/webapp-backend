@@ -5,8 +5,8 @@ pipeline
 			registry = credentials("docker_registery")
 			registryCredential = 'dockerhub'
 			githubCredential = 'github'
-			GIT_USERNAME = 'github'
-			GIT_PASSWORD = 'github'
+			GIT_USERNAME = 'iampaavan'
+			GIT_PASSWORD = 'viratKohli153@'
 			dockerImage = ''
 			GIT_COMMIT = """${sh(
                 returnStdout: true,
