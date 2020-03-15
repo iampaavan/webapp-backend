@@ -72,7 +72,7 @@ pipeline
 // 			            sh ("yq w -i ./backend/values.yaml 'awsSecretKey' ${secret_key}")
 // 			            sh ("yq w -i ./backend/values.yaml 'dbsecret.rdsurl' ${rds_url}")
 // 			            sh ("yq w -i ./backend/values.yaml 'redis.password' ${redis_password}")
-			            sh ('git config --global user.email "gopalareddy.p@husky.edu"')
+			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
 			            sh ('git config --global user.name "iampaavan"')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')

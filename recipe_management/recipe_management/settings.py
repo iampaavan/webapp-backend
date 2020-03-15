@@ -104,7 +104,6 @@ CACHES = {
 REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=os.environ.get("redisPort"), db=0, password=os.environ.get("redisPass"))
 
 
-
 # DATABASES = {
 #     'default': {
 #         "ENGINE": "django_prometheus.db.backends.postgresql",
@@ -132,7 +131,6 @@ REDIS_CONN_POOL_1 = redis.ConnectionPool(host=os.environ.get("redisHost"), port=
 #
 # # Redis Settings
 # REDIS_CONN_POOL_1 = redis.ConnectionPool(host='localhost', port=6379, db=0, password='cjgxdulfer8RK51adfJI87sW+CYAXn+nUS3X/oAMeRjUw3gJSBPRkD5LvxbXMiL4nJIfe5KOa0fJ6gAO')
-
 
 
 # DATABASES = {
