@@ -5,8 +5,6 @@ pipeline
 			registry = credentials("docker_registery")
 			registryCredential = 'dockerhub'
 			githubCredential = 'github'
-			GIT_USERNAME = 'iampaavan'
-			GIT_PASSWORD = 'viratKohli153@'
 			dockerImage = ''
 			GIT_COMMIT = """${sh(
                 returnStdout: true,
@@ -72,7 +70,7 @@ pipeline
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/iampaavan/helm-charts.git jenkins-test')
+                        sh('git push origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/iampaavan/helm-charts.git jenkins-test')
                     }
 			        }
 
