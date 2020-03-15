@@ -128,7 +128,7 @@ def update_user(request):
                     changed = True
                     continue
                 elif request_body['email_address'] != user_obj.email_address:
-                    logging.debug("cannot update email address.")
+                    logging.debug("cannot update email address")
                     return HttpResponse("Email address cannot be updated", status=400, content_type='application/json')
             if changed:
                 ser = UserSerializer(user_obj)
