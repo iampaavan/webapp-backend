@@ -68,7 +68,6 @@ pipeline
 			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
 			            sh ('git config --global user.name "paavan"')
 			            sh ("git add --all")
-			            sh("git remote add ${user.name} https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/iampaavan/helm-charts.git")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/iampaavan/helm-charts.git jenkins-test')
