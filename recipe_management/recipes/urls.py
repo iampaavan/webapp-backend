@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('user', views.user),
     path('user/self', views.update_user),
-    path('recipe', views.create_recipe),
+    path('recipe/', views.create_recipe),
     path('recipes', views.get_newest_recipe),
     path('recipe/<id>', views.recipe_crud),
     path('get/random/recipe', views.get_random_recipe),
