@@ -44,7 +44,7 @@ pipeline
 					 }
 				}
 			}
-			stage('clone helm chart repo')
+			stage('Clone Helm Chart Repo')
 			{
 			    steps
 			    {
@@ -66,6 +66,14 @@ pipeline
 			            sh ("yq w -i ./backend/values.yaml 'image.name' '${registry}:${GIT_COMMIT}'")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
+// 			            sh ("yq w -i ./backend/values.yaml 'imageCredentials.username' ${docker_username}")
+// 			            sh ("yq w -i ./backend/values.yaml 'imageCredentials.password' ${docker_password}")
+// 			            sh ("yq w -i ./backend/values.yaml 'bucketname' ${s3_bucket}")
+// 			            sh ("yq w -i ./backend/values.yaml 'awsAccessKey' ${access_key}")
+// 			            sh ("yq w -i ./backend/values.yaml 'awsSecretKey' ${secret_key}")
+// 			            sh ("yq w -i ./backend/values.yaml 'dbsecret.rdsurl' ${rds_url}")
+// 			            sh ("yq w -i ./backend/values.yaml 'redis.password' ${redis_password}")
+			            sh ('git config --global user.email "gopalareddy.p@husky.edu"')
 			            sh ('git config --global user.name "iampaavan"')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
