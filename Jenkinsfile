@@ -66,7 +66,7 @@ pipeline
 			            sh ("yq w -i ./backend/values.yaml 'image.name' '${registry}:${GIT_COMMIT}'")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
-			            sh ('git config --global user.name "paavan"')
+			            sh ('git config --global user.name "iampaavan"')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
