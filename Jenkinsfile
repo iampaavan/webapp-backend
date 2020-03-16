@@ -67,7 +67,6 @@ pipeline
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
 			            sh ('git config --global user.name "iampaavan"')
-			            sh ('git config --global --unset https.proxy')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
 			            sshagent(['my_github']) {
