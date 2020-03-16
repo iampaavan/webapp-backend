@@ -70,8 +70,8 @@ pipeline
 			            sh ('git config --global --unset https.proxy')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
-			            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh('git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/iampaavan/helm-charts.git jenkins-test')
+			            sshagent(['my_github']) {
+                        sh('git push origin jenkins-test')
                     }
 			        }
 
