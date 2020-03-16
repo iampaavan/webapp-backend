@@ -69,7 +69,7 @@ pipeline
 			            sh ('git config --global user.name "iampaavan"')
 			            sh ("git add --all")
 			            sh ('git commit -m "testing jenkins ci/cd"')
-			            withCredentials([usernamePassword(credentialsId: githubCredential, passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+			            sshagent(['my-github']) {
                         sh('git push origin jenkins-test')
                     }
 			        }
