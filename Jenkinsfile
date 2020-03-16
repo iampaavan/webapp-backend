@@ -65,7 +65,6 @@ pipeline
 			            sh ("yq r ./backend/values.yaml 'image.name'")
 			            sh ("yq w -i ./backend/values.yaml 'image.name' '${registry}:${GIT_COMMIT}'")
 			            sh ("yq r ./backend/values.yaml 'image.name'")
-			            sh ("git config --global --unset http.proxy")
 			            sh ('git config --global user.email "gopalareddy.p@husky.neu.edu"')
 			            sh ('git config --global user.name "iampaavan"')
 			            sh ("git add --all")
