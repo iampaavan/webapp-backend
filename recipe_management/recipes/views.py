@@ -35,7 +35,7 @@ AWS_SECRET_KEY = os.environ.get("SECRET_ACCESS_KEY_ID")
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 logging.debug(CACHE_TTL)
-print(f'Cache TTL is: {CACHE_TTL}')
+print(f'Cache TTL: {CACHE_TTL}')
 
 
 def user(request):
